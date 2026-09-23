@@ -47,7 +47,7 @@ class ApplePredictionFromTopics(Node):
         self.declare_parameter("prediction_distance_max", 1.0)
         self.declare_parameter("scan_data_path", "NOTGIVEN")
         self.declare_parameter("allow_reuse_latest_frame", False)
-        self.declare_parameter("x_tolerance", 0.5)
+        self.declare_parameter("x_tolerance", 0.9)
         
         self.ns = self.get_parameter("camera_ns").value
         self.use_aligned = bool(self.get_parameter("use_aligned_depth").value)

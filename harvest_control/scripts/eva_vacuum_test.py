@@ -11,9 +11,10 @@ class PumpIO:
         self.DO_VACUUM = 4     # DO4 -> Pump pin 3
         self.DO_BLOWOFF = 5    # DO5 -> Pump pin 4
         self.DO_DISABLE_ES = 6 # DO6 -> Pump pin 8
-        self.VAC_SENSOR_PIN = 10 # AI10 -> Pump pin 6
+        self.VAC_SENSOR_PIN = 0 # AI0 on the control box (Pump pin 6) -- reverted, pin 10 doesn't exist in analog_in_states
 
         self.vacuum_voltage = None
+        self._logged_analog_pins = False
 
         # Subscribe to IOStates to get analog input
         self.node.create_subscription(IOStates, '/io_and_status_controller/io_states', self.io_callback, 10)
@@ -21,12 +22,22 @@ class PumpIO:
         # Service client to set outputs
         self.cli_set = ros_node.create_client(SetIO, '/io_and_status_controller/set_io')
         while not self.cli_set.wait_for_service(timeout_sec=1.0):
-            ros_node.get_logger().info('Waiting for /io_and_status_controller/set_io...')
+            ros_node.get_logger().info('Waiting for /io_and_status_controller/set_io...', throttle_duration_sec=5.0)
+
+        # The service becoming discoverable doesn't mean the controller has finished
+        # settling internally -- sending a SetIO request in that same instant has been
+        # observed to segfault ur_ros2_control_node (a driver-side race, not on our end).
+        # A short pause here avoids hitting that window.
+        time.sleep(1.0)
 
     def io_callback(self, msg: IOStates):
-        # Vacuum sensor is AI0 (analog input pin 0)
+        if not self._logged_analog_pins:
+            # one-time dump so the correct VAC_SENSOR_PIN can be confirmed from a live log
+            seen = {ai.pin: ai.state for ai in msg.analog_in_states}
+            self.node.get_logger().info(f'Analog input pins on io_states: {seen}')
+            self._logged_analog_pins = True
         for ai in msg.analog_in_states:
-            if ai.pin == 0:  # <- Corrected pin number
+            if ai.pin == self.VAC_SENSOR_PIN:
                 self.vacuum_voltage = ai.state  # voltage from sensor
 
     def set_do(self, pin, state: bool):
@@ -44,7 +55,7 @@ class PumpIO:
     def read_vacuum(self):
         """Return vacuum level in -kPa based on last received voltage (1–5V sensor)"""
         if self.vacuum_voltage is None:
-            self.node.get_logger().warn("No vacuum sensor data received yet")
+            self.node.get_logger().warn("No vacuum sensor data received yet", throttle_duration_sec=5.0)
             return None
         
         # Clamp voltage to expected range

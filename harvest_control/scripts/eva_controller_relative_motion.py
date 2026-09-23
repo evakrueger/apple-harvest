@@ -7,38 +7,60 @@ FlexToFListener (edited to support start/stop services)
 import rclpy
 from rclpy.node import Node
 from rclpy.executors import MultiThreadedExecutor
-from rclpy.callback_groups import MutuallyExclusiveCallbackGroup, ReentrantCallbackGroup
+from rclpy.callback_groups import ReentrantCallbackGroup
 # Interfaces
-from rcl_interfaces.msg import Parameter, ParameterValue, ParameterType
-from rcl_interfaces.srv import SetParameters
-from std_srvs.srv import Trigger, Empty
+from std_srvs.srv import Empty, Trigger
 from std_msgs.msg import Float32MultiArray, Int32, Float32
 from geometry_msgs.msg import TwistStamped, WrenchStamped  # to publish to the UR5
-from controller_manager_msgs.srv import SwitchController
 import numpy as np
 from eva_vacuum_test import PumpIO # my vacuum control file
-import time
 from collections import deque
 import joblib
 from ament_index_python.packages import get_package_share_directory
 from pathlib import Path
-from collections import deque
-# at top of file (merge with existing imports)
 from rclpy.qos import QoSProfile
 from message_filters import ApproximateTimeSynchronizer, Subscriber
 
 
-FLEX_CONTROLLER = False  # change to False to stop flex sensor servoing
+FLEX_CONTROLLER = True  # change to False to stop flex sensor servoing
+TOF_CONTROLLER = True   # change to False to use a distance-only trigger (not relative distance)
+PRESSURE_CONTROLLER = True  # change to False to stop pressure threshold logic
+RF_CONTROLLER = False # not fully debugged when true. don't change to true.
 
-TOF_CONTROLLER = False   # change to False to use a distance-only trigger (not relative distance)
-
-PRESSURE_CONTROLLER = False  # change to False to stop pressure threshold logic
 PRESSURE_THRESHOLD = -56    # this is a "good enough" pressure to reach, to continue onto picking motion
 PRESSURE_CONTROLLER_TIMEOUT = 5.0   # waits 5 seconds before starting picking motion
 
-RF_CONTROLLER = True
 PICKING_TIME = 2.0
-RELEASE_TIME = 4.0
+TWIST_SPEED = 3.1 # must be under 3.14
+PULL_SPEED = 1.5
+
+# --- Wiggle: cycles small nudges while 'pick' waits on vacuum pressure, instead of
+# sitting still. Treats the apple as a sphere: nudge up+forward while tilting down,
+# return; down+forward while tilting up, return; left+forward tilting right, return;
+# right+forward tilting left, return; then repeats until pressure engages or timeout.
+# Axis mapping is a GUESS (Servo runs in base_link frame here, not tool frame) --
+# verify on the robot and flip the *_SIGN constants (not the axis assignment) if a
+# direction comes out backwards. cmd_vx = vertical, cmd_vy = lateral, angular.y pairs
+# with vertical (pitch), angular.x pairs with lateral (roll), always opposite in sign
+# to the linear nudge per the pattern above.
+WIGGLE_ENABLED = True
+WIGGLE_MAGNITUDE = 0.15        # m/s, linear nudge speed -- slow and minor by design
+WIGGLE_TILT_MAGNITUDE = 2.0    # rad/s, tilt speed (independent units from the linear nudge)
+WIGGLE_PHASE_DURATION = 0.4    # seconds per phase (nudge-out or return-to-original)
+WIGGLE_VERTICAL_SIGN = 1.0     # flip to -1.0 if +cmd_vx turns out to be "down" not "up"
+WIGGLE_LATERAL_SIGN = 1.0      # flip to -1.0 if +cmd_vy turns out to be "right" not "left"
+WIGGLE_TILT_SIGN = 1.0         # flip to -1.0 if tilt direction comes out inverted
+# (vertical, lateral, forward) per phase; tilt is derived from vertical/lateral, not listed here
+_WIGGLE_PHASES = [
+    ( 1,  0,  1),  # up + forward, tilt down
+    (-1,  0, -1),  # return to original
+    (-1,  0,  1),  # down + forward, tilt up
+    ( 1,  0, -1),  # return to original
+    ( 0,  1,  1),  # left + forward, tilt right
+    ( 0, -1, -1),  # return to original
+    ( 0, -1,  1),  # right + forward, tilt left
+    ( 0,  1, -1),  # return to original
+]
 
 class FlexToFListener(Node):
     def __init__(self, calibrate=False):
@@ -97,15 +119,11 @@ class FlexToFListener(Node):
         self.tof_history = deque(maxlen=15)
         self.controller = 'default'
 
-        # --- RUNNING FLAG (start/stop) ---
-        self.running = False  # gate control loop
-
-        # --- CLIENTS READY FLAG (we'll set up blocking clients lazily on start) ---
-        self._clients_ready = False
-
         # --- start/stop services
         self.start_service = self.create_service(Empty, 'relative_motion/start_controller', self.handle_start)
         self.stop_service  = self.create_service(Empty, 'relative_motion/stop_controller', self.handle_stop)
+        self.status_service = self.create_service(Trigger, 'relative_motion/get_status', self.handle_get_status)
+        self.release_service = self.create_service(Empty, 'relative_motion/release_apple', self.handle_release_apple)
 
         self.get_logger().info('FlexToFListener initialized (start/stop services created).')
 
@@ -257,6 +275,18 @@ class FlexToFListener(Node):
             self.get_logger().info("stop_controller called but controller already stopped.")
         return response
 
+    def handle_get_status(self, request, response):
+        # success=True means the controller is still actively running;
+        # message carries the current state for callers that want more detail.
+        response.success = self.running
+        response.message = self.state
+        return response
+
+    def handle_release_apple(self, request, response):
+        self.get_logger().info("release_apple: turning off vacuum.")
+        self.pump.vacuum_off()
+        return response
+
 
     # --- SUBSCRIBERS & PUBLISHERS (unchanged) ---
     def flex_callback(self, msg):
@@ -274,6 +304,17 @@ class FlexToFListener(Node):
         first_avg = sum(list(self.tof_history)[:5]) / 5
         last_avg = sum(list(self.tof_history)[-5:]) / 5
         return last_avg - first_avg
+
+    def _compute_wiggle(self, elapsed):
+        """Returns (vx, vy, vz, wx, wy) for the current wiggle phase, cycling on a timer."""
+        phase_idx = int(elapsed // WIGGLE_PHASE_DURATION) % len(_WIGGLE_PHASES)
+        vert, lat, fwd = _WIGGLE_PHASES[phase_idx]
+        vx = vert * WIGGLE_VERTICAL_SIGN * WIGGLE_MAGNITUDE
+        vy = lat * WIGGLE_LATERAL_SIGN * WIGGLE_MAGNITUDE
+        vz = fwd * WIGGLE_MAGNITUDE
+        wy = -vert * WIGGLE_TILT_SIGN * WIGGLE_TILT_MAGNITUDE  # paired with vertical, opposite sign
+        wx = -lat * WIGGLE_TILT_SIGN * WIGGLE_TILT_MAGNITUDE   # paired with lateral, opposite sign
+        return vx, vy, vz, wx, wy
 
     def pressure_callback(self, msg):
         self.latest_pressure = msg.data  # store suction pressure
@@ -386,13 +427,13 @@ class FlexToFListener(Node):
             # do not publish or actuate if not running
             return
 
-        diff = self.get_tof_diff()
+        # --- STOP IMMEDIATELY ON TERMINAL STATE, RATHER THAN WAITING FOR THE AUTO-STOP TIMEOUT ---
+        if self.state in ('done', 'failed'):
+            self.get_logger().info(f"Controller reached terminal state '{self.state}'; stopping.")
+            self.handle_stop(Empty.Request(), Empty.Response())
+            return
 
-        if diff is not None:
-            # self.get_logger().info(f"ToF change over buffer: {diff}")
-            pass
-
-        self.get_logger().info(f"Running?: {self.running}, CONTROLLER: {self.controller}, STATE: {self.state}, force: {self.latest_force}, tof: {self.latest_tof}, pressure: {self.latest_pressure}")
+        self.get_logger().debug(f"Running?: {self.running}, CONTROLLER: {self.controller}, STATE: {self.state}, force: {self.latest_force}, tof: {self.latest_tof}, pressure: {self.latest_pressure}")
         now = self.get_clock().now().nanoseconds * 1e-9
         dt = now - self.prev_time
         self.prev_time = now
@@ -403,7 +444,6 @@ class FlexToFListener(Node):
         # Kalman + PID
         self._kalman_update(self.latest_flex)
         vx, vy = self._pid_compute(self.x, dt)
-        vz = 0.0
         ex = abs(self.smoothed_x - self.current_x)
         ey = abs(self.smoothed_y - self.current_y)
 
@@ -428,6 +468,7 @@ class FlexToFListener(Node):
                         self.state = 'pick'
                         self.pick_start_time = now
                         self.latest_pressure = None
+                        self.prev_cmd_x = self.prev_cmd_y = self.prev_cmd_z = 0.00
                         self.get_logger().info(f'Picking: turning on vacuum (tof = {self.latest_tof})')
                         self.pump.vacuum_on()
         if self.controller == 'relative_controller':
@@ -439,11 +480,12 @@ class FlexToFListener(Node):
                 if ex > self.position_threshold or ey > self.position_threshold:
                     if FLEX_CONTROLLER:
                         self.state = 'servo'
-                    elif not FLEX_CONTROLLER:
-                        self.get_logger().info("FLEX CONTROLLER IS NOT ENABLED STAY IN APPROACH STATE")
-                if self.get_tof_diff() < 0: # apple is getting closer
+                    else:
+                        self.get_logger().debug("FLEX CONTROLLER IS NOT ENABLED STAY IN APPROACH STATE")
+                tof_diff = self.get_tof_diff()
+                if tof_diff < 0: # apple is getting closer
                     self.get_logger().info("apple is getting closer")
-                elif self.get_tof_diff() > 1: # apple is being pushed away
+                elif tof_diff > 1: # apple is being pushed away
                     self.get_logger().info("apple is getting pushed away")
                     self.state = 'reverse'
                 else: # apple is nicely aligned
@@ -451,27 +493,28 @@ class FlexToFListener(Node):
                     self.state = 'pick'
                     self.pick_start_time = now
                     self.latest_pressure = None
+                    self.prev_cmd_x = self.prev_cmd_y = self.prev_cmd_z = 0.00
                     self.get_logger().info(f'Picking: turning on vacuum (tof = {self.latest_tof})')
                     self.pump.vacuum_on()
             if self.state == 'reverse':
-                if self.get_tof_diff() < 0: # apple is getting closer
-                    self.get_logger().info("apple is getting closer")
-                elif self.get_tof_diff() > 1: # apple is being pushed away
-                    self.get_logger().info("apple is getting further away")
+                tof_diff = self.get_tof_diff()
+                if tof_diff < 0: # apple is getting closer
+                    self.get_logger().debug("apple is getting closer")
+                elif tof_diff > 1: # apple is being pushed away
+                    self.get_logger().debug("apple is getting further away")
                     self.state = 'approach'
                 else: # apple is nicely aligned
-                    self.get_logger().info("apple is nicely aligned")
+                    self.get_logger().debug("apple is nicely aligned")
                     self.state = 'pick'
                     self.pick_start_time = now
                     self.latest_pressure = None
+                    self.prev_cmd_x = self.prev_cmd_y = self.prev_cmd_z = 0.00
                     self.get_logger().info(f'Picking: turning on vacuum (tof = {self.latest_tof})')
                     self.pump.vacuum_on()
             elif self.state == 'pick':
-                # immediate brake:
-                self.prev_cmd_x = self.prev_cmd_y = self.prev_cmd_z = 0.00
                 elapsed = now - self.pick_start_time # start of grasp
                 pressure = self.latest_pressure if self.latest_pressure is not None else float('inf')
-                self.get_logger().info(f"[DEBUG] pick elapsed={elapsed:.2f}, pressure={pressure}")
+                self.get_logger().debug(f"pick elapsed={elapsed:.2f}, pressure={pressure}")
                 # Success
                 if PRESSURE_CONTROLLER:
                     if pressure <= PRESSURE_THRESHOLD:
@@ -495,7 +538,7 @@ class FlexToFListener(Node):
                     self.release_start_time = now
             elif self.state == 'release':
                 elapsed_release = now - self.release_start_time
-                self.get_logger().info(f"RELEASE elapsed={elapsed_release:.2f}")
+                self.get_logger().debug(f"RELEASE elapsed={elapsed_release:.2f}")
 
                 if RF_CONTROLLER and self.rf_model_loaded:
                     self.get_logger().info("RF CONTROLLER STUFF IS HAPPENING NOW")
@@ -522,21 +565,18 @@ class FlexToFListener(Node):
 
                 # Pulling back (picking motion)
                 if elapsed_release < PICKING_TIME:
-                    self.get_logger().info("retreating...")
-                # Release
-                elif elapsed_release < RELEASE_TIME:
-                    self.get_logger().info("releasing apple now...")
-                    self.pump.vacuum_off()
-
-                # Final state resolution
+                    self.get_logger().debug("retreating...")
+                # Final state resolution -- no untwist/settle phase; go_to_home() in
+                # start_harvest.py handles returning the arm to a sane pose afterward.
                 else:
                     self.get_logger().info("Entire controller done")
                     self.state = 'done'
 
         cmd_wz = 0.0   # default: no rotation
+        cmd_wx = cmd_wy = 0.0  # default: no tilt
         # --- Command selection ---
         if self.state == 'servo':
-            cmd_vx, cmd_vy, cmd_vz = -vx, -vy, 0.1
+            cmd_vx, cmd_vy, cmd_vz = vx, vy, 0.1
         elif self.state == 'approach':
             cmd_vx, cmd_vy = 0.0, 0.0
             cmd_vz = 0.1 * self.velocity_scale_factor_z
@@ -544,14 +584,14 @@ class FlexToFListener(Node):
             cmd_vx, cmd_vy = 0.0, 0.0
             cmd_vz = -0.1 * self.velocity_scale_factor_z
         elif self.state == 'release':
-            elapsed_release = now - self.release_start_time
-            if elapsed_release < 2.0:
-                cmd_vx, cmd_vy, cmd_vz = 0.0, 0.0, -2.0
-                cmd_wz = -4.0
-            elif elapsed_release < 4.0:
-                cmd_vx, cmd_vy, cmd_vz = 0.0, 0.0, 0.0
-                cmd_wz = 4.0
-        else: # pick state or done state
+            # by construction, still being in 'release' here means elapsed_release < PICKING_TIME
+            # (the state-transition block above already moves on to 'done' once it isn't)
+            cmd_vx, cmd_vy, cmd_vz = 0.0, 0.0, -PULL_SPEED
+            cmd_wz = -1*TWIST_SPEED
+        elif self.state == 'pick' and WIGGLE_ENABLED:
+            elapsed_pick = now - self.pick_start_time
+            cmd_vx, cmd_vy, cmd_vz, cmd_wx, cmd_wy = self._compute_wiggle(elapsed_pick)
+        else: # pick state (wiggle disabled) or done state
             cmd_vx = cmd_vy = cmd_vz = 0.0
 
 
@@ -577,7 +617,8 @@ class FlexToFListener(Node):
         cmd.twist.linear.x = out_x
         cmd.twist.linear.y = out_y
         cmd.twist.linear.z = out_z
-        cmd.twist.angular.x = cmd.twist.angular.y = 0.0
+        cmd.twist.angular.x = cmd_wx
+        cmd.twist.angular.y = cmd_wy
         cmd.twist.angular.z = cmd_wz
         self.gripper_pub.publish(cmd)
         # self.get_logger().info(f"PUBLISHING COMMAND!!!!: {cmd}")
@@ -590,19 +631,18 @@ class FlexToFListener(Node):
     # The rest of your helper functions are unchanged; include them as-is:
     def _init_kalman(self):
         n, m = 2, 4
-        self.z = np.zeros((m,1))
         self.x = np.zeros((n,1))
         self.P = np.eye(n)
         self.A = np.eye(n)
         self.H = np.array([[1,0],[0,1],[-1,0],[0,-1]])
         self.Q = np.eye(n)*0.05
-        self.R = np.eye(m)*0.05
+        self.R = np.eye(m)*0.6  # measurement variance for ~5deg (post /4.0 scaling) sensor noise floor
 
     def _init_pid(self):
         self.current_x = self.current_y = 0.0
         self.current_x_vel = self.current_y_vel = 0.0
         self.smoothed_x = self.smoothed_y = 0.0
-        self.alpha_pos = 0.9
+        self.alpha_pos = 0.3
         self.alpha_cmd = 0.3
         self.K_p = 0.3
         self.K_i = 0.0
@@ -611,18 +651,6 @@ class FlexToFListener(Node):
         self.prev_err_x = self.prev_err_y = 0.0
         self.vel_max = 0.3
         self.acc_max = 3.0
-
-    def _setup_servo_clients(self):
-        mcb = MutuallyExclusiveCallbackGroup()
-        self.switch_cli = self.create_client(SwitchController, "/controller_manager/switch_controller", callback_group=mcb)
-        self.start_cli = self.create_client(Trigger, "/servo_node/start_servo", callback_group=mcb)
-        self.param_cli = self.create_client(SetParameters, "/servo_node/set_parameters", callback_group=mcb)
-        while not self.switch_cli.wait_for_service(1.0):
-            self.get_logger().info("Waiting switch_controller...")
-        while not self.start_cli.wait_for_service(1.0):
-            self.get_logger().info("Waiting start_servo...")
-        while not self.param_cli.wait_for_service(1.0):
-            self.get_logger().info("Waiting set_parameters...")
 
     def _kalman_update(self, z):
         x_p = self.A @ self.x
@@ -653,28 +681,6 @@ class FlexToFListener(Node):
         self.prev_err_x, self.prev_err_y = err_x, err_y
         self.current_x_vel, self.current_y_vel = vx, vy
         return vx * self.velocity_scale_factor_xy, vy * self.velocity_scale_factor_xy
-
-    def _enable_servo_mode(self, frame: str = "tool0", sim=False):
-        req = SwitchController.Request()
-        req.activate_controllers = ["forward_position_controller"]
-        if sim:
-            req.deactivate_controllers = ["scaled_joint_trajectory_controller"]
-        else:
-            req.deactivate_controllers = ["scaled_joint_trajectory_controller"]
-        req.strictness = SwitchController.Request.STRICT
-        req.timeout = rclpy.duration.Duration(seconds=5.0).to_msg()
-        fut = self.switch_cli.call_async(req)
-        rclpy.spin_until_future_complete(self, fut)
-
-        start_req = Trigger.Request()
-        fut2 = self.start_cli.call_async(start_req)
-        rclpy.spin_until_future_complete(self, fut2)
-
-        prm = SetParameters.Request()
-        val = ParameterValue(type=ParameterType.PARAMETER_STRING, string_value=frame)
-        prm.parameters = [Parameter(name='moveit_servo.robot_link_command_frame', value=val)]
-        fut3 = self.param_cli.call_async(prm)
-        rclpy.spin_until_future_complete(self, fut3)
 
 
 def main():

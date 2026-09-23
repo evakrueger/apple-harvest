@@ -3,7 +3,8 @@ from ament_index_python.packages import get_package_prefix, get_package_share_di
 from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument
 from launch.substitutions import LaunchConfiguration
-from launch.actions import ExecuteProcess, IncludeLaunchDescription
+from launch.actions import ExecuteProcess, IncludeLaunchDescription, RegisterEventHandler, TimerAction
+from launch.event_handlers import OnProcessExit
 from launch_ros.actions import Node
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch_ros.actions import SetParameter
@@ -65,7 +66,17 @@ def generate_launch_description():
         'arm_moveit_config.launch.py'
     )
 
-    return LaunchDescription(declared_arguments + [
+    # A previous run that was force-killed (rather than let shut down cleanly) can leave
+    # dashboard_client / controller_stopper_node / ur_ros2_control_node orphaned and still
+    # holding the robot's dashboard connection, which then blocks this run's driver from
+    # ever bringing up controller_manager. Clear those out before starting anything else.
+    cleanup_stale_driver_processes = ExecuteProcess(
+        cmd=['pkill', '-f',
+             'ur_robot_driver/(dashboard_client|controller_stopper_node|ur_ros2_control_node)'],
+        output='screen',
+    )
+
+    driver_and_nodes = [
         # Include UR driver launch
         IncludeLaunchDescription(
             PythonLaunchDescriptionSource(ur_driver_launch_path),
@@ -200,7 +211,7 @@ def generate_launch_description():
             name='record_topics_node',
         ),
 
-        # Add this inside your LaunchDescription list, e.g., at the end
+        # microros stuff
         ExecuteProcess(
             cmd=[
                 '/bin/bash', '-c',
@@ -211,4 +222,16 @@ def generate_launch_description():
             output='screen'
         ),
 
+    ]
+
+    return LaunchDescription(declared_arguments + [
+        cleanup_stale_driver_processes,
+        RegisterEventHandler(
+            OnProcessExit(
+                target_action=cleanup_stale_driver_processes,
+                # small buffer so the robot's dashboard server has time to fully release
+                # the old connection before the new dashboard_client tries to connect
+                on_exit=[TimerAction(period=2.0, actions=driver_and_nodes)],
+            )
+        ),
     ])

@@ -10,13 +10,13 @@ def generate_launch_description():
     # The base camera is currently the D435
     base_serial_arg = DeclareLaunchArgument(
         "base_serial",
-        default_value="'829212072203'",
+        default_value="'040322070611'",
         description="Serial number for the base RealSense camera"
     )
     # The mast camera is currently the D435I
     mast_serial_arg = DeclareLaunchArgument(
         "mast_serial",
-        default_value="'829212072203'",
+        default_value="'040322070611'",
         description="Serial number for the mast RealSense camera"
     )
 

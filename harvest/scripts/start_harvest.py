@@ -112,8 +112,11 @@ class StartHarvest(Node):
             self.linear_pull_stop_cli = self.make_client(Empty, '/linear/stop_controller')
 
             # EVA controller (the node you added as name='relative_motion')
-            self.eva_controller_start_cli = self.make_client(Empty, '/relative_motion/start_controller')
-            self.eva_controller_stop_cli  = self.make_client(Empty, '/relative_motion/stop_controller')
+            self.eva_controller_start_cli  = self.make_client(Empty, '/relative_motion/start_controller')
+            self.eva_controller_stop_cli   = self.make_client(Empty, '/relative_motion/stop_controller')
+            self.eva_controller_status_cli = self.make_client(Trigger, '/relative_motion/get_status')
+            self.eva_controller_release_cli = self.make_client(Empty, '/relative_motion/release_apple')
+            self.last_pick_state = None  # set by pick_controller(); gates the release prompt
 
             # Controller tuning / goal
             self.set_goal_cli = self.make_client(SetValue, '/set_goal')
@@ -125,7 +128,7 @@ class StartHarvest(Node):
     def make_client(self, srv_type, name):
         client = self.create_client(srv_type, name, callback_group=self.cb_group)
         while not client.wait_for_service(timeout_sec=1.0):
-            self.get_logger().info(f"Waiting for service '{name}', retrying...")
+            self.get_logger().info(f"Waiting for service '{name}', retrying...", throttle_duration_sec=5.0)
         return client
 
     def init_metadata_and_topics(self):
@@ -141,7 +144,7 @@ class StartHarvest(Node):
         ]
         # I use topics below as the ones being recorded during my relative_motion_controller actions
         self.relative_motion_controller_topics = [
-            '/tof_sensor_data', '/flex_sensor_data', '/joint_states', '/tool_pose', '/gripper_tip', '/servo_node/delta_twist_cmds',
+            '/tof_sensor_data', '/flex_sensor_data', '/joint_states', '/tool_pose', '/servo_node/delta_twist_cmds',
             '/force_torque_sensor_broadcaster/wrench', '/vacuum_pressure', '/image_raw', '/camera/mast_camera/color/image_raw'
         ]
 
@@ -339,9 +342,17 @@ class StartHarvest(Node):
     def go_to_home(self):
         # Starts go to home
         self.request = Trigger.Request()
-        self.future = self.start_move_arm_to_home_client.call_async(self.request)
-        rclpy.spin_until_future_complete(self, self.future) 
-        return self.future.result()
+        for attempt in range(1, 4):
+            self.future = self.start_move_arm_to_home_client.call_async(self.request)
+            rclpy.spin_until_future_complete(self, self.future, timeout_sec=15.0)
+            if self.future.done():
+                return self.future.result()
+            self.get_logger().warn(
+                f'go_to_home: no response after 15s (attempt {attempt}/3); '
+                'request may have been dropped before client/server discovery finished. Retrying...'
+            )
+        self.get_logger().error('go_to_home: giving up after 3 attempts with no response.')
+        return None
     
     def call_coord_to_traj(self, apple_pose):
         x = apple_pose.position.x
@@ -438,11 +449,26 @@ class StartHarvest(Node):
             rclpy.spin_until_future_complete(self, self.future)
         
         elif self.PICK_PATTERN == 'eva-relative-motion':
-            stop_time = 20
+            max_wait = 20      # safety-net upper bound, matches the controller's own auto-stop timer
+            poll_period = 0.5
+            self.last_pick_state = None
             self.future = self.eva_controller_start_cli.call_async(req)
             rclpy.spin_until_future_complete(self, self.future)
-            time.sleep(stop_time)
-            
+
+            elapsed = 0.0
+            while elapsed < max_wait:
+                status_req = Trigger.Request()
+                self.future = self.eva_controller_status_cli.call_async(status_req)
+                rclpy.spin_until_future_complete(self, self.future)
+                result = self.future.result()
+                if result is not None:
+                    self.last_pick_state = result.message  # 'pick'/'release'/'done'/'failed'/etc.
+                if result is None or not result.success:
+                    # controller reports it's no longer running (or didn't respond)
+                    break
+                time.sleep(poll_period)
+                elapsed += poll_period
+
             self.future = self.eva_controller_stop_cli.call_async(req)
             rclpy.spin_until_future_complete(self, self.future)
         
@@ -484,7 +510,7 @@ class StartHarvest(Node):
         stage_name = prefix if isinstance(prefix, str) else str(prefix)
         print(f"--- Running stage: {stage_name} ---")
         if self.enable_recording:
-            self.start_recording(topics, self.base_data_dir + prefix)
+            self.start_recording(topics, prefix)
             time.sleep(self.recording_startup_delay)
         # Engage servo or trajectory
         self.switch_controller(servo=use_servo)
@@ -523,7 +549,29 @@ class StartHarvest(Node):
         self.get_logger().info(f'Resetting arm to home position')
         self.go_to_home()
 
+
         # Stage 2: Request apple location prediction
+        if self.enable_apple_prediction:
+            self.get_logger().info('Predicting apple locations')
+            apple_poses = self.start_apple_prediction()
+        else:
+            self.get_logger().info('Skipping apple prediction, using pre-saved locations')
+            apple_poses = PoseArray()
+            apple_poses.poses = [
+                Pose(position=Point(x=row[0], y=row[1], z=row[2]))
+                for row in self.pre_saved_apple_locations
+            ]
+        self.apple_coordinates = {f'apple_{i+1}': [p.position.x,p.position.y,p.position.z]
+                                    for i,p in enumerate(apple_poses.poses)}
+        self.get_logger().info(f'Found {len(apple_poses.poses)} apples!')
+
+        # Loop over apple locations
+        for idx, coord in enumerate(apple_poses.poses):
+            # Update base directory for new apple location
+            base_dir = self.batch_dir + f'apple_{idx}/'
+
+
+        # # Stage 2: Request apple location prediction
         # if self.enable_apple_prediction:
         #     self.get_logger().info('Predicting apple locations')
         #     apple_poses = self.start_apple_prediction()
@@ -536,27 +584,28 @@ class StartHarvest(Node):
         #     ]
         
         # # Filter the list to only include reachable apples
-        # reachable_apples = [p for p in apple_poses.poses if self.is_within_reach(p)]
+        # # reachable_apples = [p for p in apple_poses.poses if self.is_within_reach(p)]
 
-        # self.get_logger().info(f"Found {len(apple_poses.poses)} apples, {len(reachable_apples)} are reachable.")
+        # # self.get_logger().info(f"Found {len(apple_poses.poses)} apples, {len(reachable_apples)} are reachable.")
 
-        # # Only iterate through the reachable ones
-        # self.apple_coordinates = {f'apple_{i+1}': [p.position.x,p.position.y,p.position.z]
-        #                             for i,p in enumerate(reachable_apples)}
+        # # # Only iterate through the reachable ones
+        # # self.apple_coordinates = {f'apple_{i+1}': [p.position.x,p.position.y,p.position.z]
+        # #                             for i,p in enumerate(reachable_apples)}
 
         # # Loop over apple locations
-        # for idx, coord in enumerate(reachable_apples):
+        # self.get_logger().info(f"Found {len(apple_poses.poses)} apples")
+        # for idx, coord in enumerate(apple_poses.poses):
         #     # Update base directory for new apple location
-        base_dir = self.batch_dir + f'apple_{0}/'
+        #     base_dir = self.batch_dir + f'apple_{0}/'
 
-        #     # Stage 3: Approach apple
-        #     input(f'Hit enter to start with apple {idx}')
-        #     self.get_logger().info(f'Approaching apple {idx}: Coord {coord}')
-        #     if self.use_optimal_trajectory:
-        #         waypoints = self.call_coord_to_traj(coord)
-        #         self.trigger_arm_mover(waypoints)
-        #     else:
-        #         self.trigger_move_arm_to_pose(coord)
+            # Stage 3: Approach apple
+            input(f'Hit enter to start with apple {idx}')
+            self.get_logger().info(f'Approaching apple {idx}: Coord {coord}')
+            # if self.use_optimal_trajectory:
+            #     waypoints = self.call_coord_to_traj(coord)
+            #     self.trigger_arm_mover(waypoints)
+            # else:
+            #     self.trigger_move_arm_to_pose(coord)
 
         # Stage 4: pick controller
         if self.enable_picking:
@@ -575,10 +624,17 @@ class StartHarvest(Node):
             )
 
             # Stage 5: home & release & save
-            input('Done with pick, hit enter to return home')
             self.go_to_home()
-            # if self.enable_pressure_servo: TODO: MAY BE NICE TO EDIT, TO DROP THE APPLE AT THIS POINT, RATHER THAN EARLIER (inside my controller
-            #     self.release_controller()
+
+            if self.PICK_PATTERN == 'eva-relative-motion':
+                if self.last_pick_state == 'done':
+                    input('Press enter to release apple')
+                    self.future = self.eva_controller_release_cli.call_async(Empty.Request())
+                    rclpy.spin_until_future_complete(self, self.future)
+                else:
+                    self.get_logger().warn(
+                        f"Skipping release prompt: pick did not complete successfully (last state: {self.last_pick_state})"
+                    )
 
         if self.enable_recording:
             self.save_metadata()

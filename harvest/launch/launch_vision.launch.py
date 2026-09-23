@@ -100,7 +100,8 @@ def generate_launch_description():
                 package="usb_cam",
                 executable="usb_cam_node_exe",
                 name="usb_cam_node",
-                parameters=[{"video_device": "/dev/video6"}],
+                # resolve by-id symlink here; usb_cam mangles relative symlinks into /dev/../../videoN
+                parameters=[{"video_device": os.path.realpath("/dev/v4l/by-id/usb-046d_0809_0BC94709-video-index0")}],
                 output="screen"
             )
     
