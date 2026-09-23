@@ -7,7 +7,7 @@ from rclpy.executors import MultiThreadedExecutor
 from rclpy.callback_groups import MutuallyExclusiveCallbackGroup
 # Interfaces
 from rcl_interfaces.msg import Parameter, ParameterValue, ParameterType
-from rcl_interfaces.srv import SetParameters
+from rcl_interfaces.srv import SetParameters, GetParameters
 from std_srvs.srv import Trigger, Empty
 from geometry_msgs.msg import Point, Pose, PoseArray
 from harvest_interfaces.srv import ApplePrediction, CoordinateToTrajectory, SendTrajectory, RecordTopics, GetGripperPose, SetValue, MoveToPose
@@ -116,6 +116,7 @@ class StartHarvest(Node):
             self.eva_controller_stop_cli   = self.make_client(Empty, '/relative_motion/stop_controller')
             self.eva_controller_status_cli = self.make_client(Trigger, '/relative_motion/get_status')
             self.eva_controller_release_cli = self.make_client(Empty, '/relative_motion/release_apple')
+            self.eva_controller_params_cli = self.make_client(GetParameters, '/relative_motion/get_parameters')
             self.last_pick_state = None  # set by pick_controller(); gates the release prompt
 
             # Controller tuning / goal
@@ -449,7 +450,7 @@ class StartHarvest(Node):
             rclpy.spin_until_future_complete(self, self.future)
         
         elif self.PICK_PATTERN == 'eva-relative-motion':
-            max_wait = 20      # safety-net upper bound, matches the controller's own auto-stop timer
+            max_wait = 40      # safety-net upper bound; the controller's own auto-stop (20 s + pull length beyond 2 s) normally ends it first
             poll_period = 0.5
             self.last_pick_state = None
             self.future = self.eva_controller_start_cli.call_async(req)
@@ -489,6 +490,36 @@ class StartHarvest(Node):
         rclpy.spin_until_future_complete(self, self.future)
         return self.future.result()
     
+    def get_pick_settings(self):
+        # Read the relative_motion controller's settings (pull pattern + controller switches) for metadata
+        if not self.enable_picking:
+            return {}
+        names = ['pull_pattern', 'resolved_pull_duration', 'flex_controller', 'tof_controller', 'pressure_controller']
+        req = GetParameters.Request()
+        req.names = names
+        self.future = self.eva_controller_params_cli.call_async(req)
+        rclpy.spin_until_future_complete(self, self.future, timeout_sec=5.0)
+        result = self.future.result()
+        if result is None or len(result.values) != len(names):
+            self.get_logger().warn("Could not read relative_motion settings for metadata")
+            return {name: None for name in names}
+        getters = {ParameterType.PARAMETER_BOOL: 'bool_value', ParameterType.PARAMETER_DOUBLE: 'double_value',
+                   ParameterType.PARAMETER_STRING: 'string_value', ParameterType.PARAMETER_INTEGER: 'integer_value'}
+        settings = {}
+        for name, value in zip(names, result.values):
+            settings[name] = getattr(value, getters[value.type]) if value.type in getters else None
+        settings['pull_duration'] = settings.pop('resolved_pull_duration')
+        return settings
+
+    def save_apple_metadata(self, apple_dir):
+        # Per-apple settings + outcome, next to that apple's bag
+        data = {'pick_controller': self.PICK_PATTERN, **self.get_pick_settings()}
+        if self.PICK_PATTERN == 'eva-relative-motion':
+            data['pick_result'] = self.last_pick_state
+        os.makedirs(apple_dir, exist_ok=True)
+        with open(os.path.join(apple_dir, 'pick_metadata.yaml'), 'w') as file:
+            yaml.dump(data, file)
+
     def save_metadata(self):
         coord_list = [
             [float(x), float(y), float(z)]
@@ -497,7 +528,8 @@ class StartHarvest(Node):
         # Combine the dictionaries into a list or another structure if necessary
         data = {
             'apple_coordinates': coord_list,
-            'pick_controller': self.PICK_PATTERN
+            'pick_controller': self.PICK_PATTERN,
+            **self.get_pick_settings(),
         }
 
         # Save to a YAML file
@@ -546,8 +578,8 @@ class StartHarvest(Node):
 
     def start(self): 
         # Stage 1: Reset arm to home position
-        self.get_logger().info(f'Resetting arm to home position')
-        self.go_to_home()
+        # self.get_logger().info(f'Resetting arm to home position')
+        # self.go_to_home()
 
 
         # Stage 2: Request apple location prediction
@@ -635,6 +667,9 @@ class StartHarvest(Node):
                     self.get_logger().warn(
                         f"Skipping release prompt: pick did not complete successfully (last state: {self.last_pick_state})"
                     )
+
+            if self.enable_recording:
+                self.save_apple_metadata(base_dir)
 
         if self.enable_recording:
             self.save_metadata()

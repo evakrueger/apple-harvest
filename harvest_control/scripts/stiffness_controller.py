@@ -14,7 +14,7 @@ class StiffnessController(Node):
         
         super().__init__('stiffness_pick_controller')
         
-        self.speed = 0.2 # * 0.6 m/s
+        self.speed = 0.14 # m/s (Servo speed_units); matches pull_twist's measured real pull speed
         self.vel_cmd = Twist() # * 0.6 m/s
 
         self.wrench_subscription = self.create_subscription(WrenchStamped, '/filtered_wrench', self.process_force_meas, 10)

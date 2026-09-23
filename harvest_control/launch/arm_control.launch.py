@@ -8,6 +8,7 @@ from launch.event_handlers import OnProcessExit
 from launch_ros.actions import Node
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch_ros.actions import SetParameter
+from launch_ros.parameter_descriptions import ParameterValue
 
 
 def generate_launch_description():
@@ -33,6 +34,12 @@ def generate_launch_description():
     # The pick pattern is dependent on the controller selected with the below parameter
     declared_arguments.append(DeclareLaunchArgument("pick_pattern", default_value="pull-twist", 
                                   description="Pick pattern used, can specify: 'pull-twist', 'force-heuristic', or 'linear-pull'."))
+    # Pull motion the relative_motion (eva) controller hands off to after a successful grasp
+    declared_arguments.append(DeclareLaunchArgument("pull_pattern", default_value="pull_twist_controller",
+                                  description="Pull used by relative_motion after grasp: 'pull_twist_controller', 'linear_controller', "
+                                              "'heuristic_controller', or 'stiffness_controller'."))
+    declared_arguments.append(DeclareLaunchArgument("pull_duration", default_value="-1.0",
+                                  description="Seconds to run the pull; negative uses that pull_pattern's default."))
     
     ### coordinate_to_trajectory node parameter
     # If using MoveIt with simulation or hardware
@@ -181,7 +188,9 @@ def generate_launch_description():
             executable='eva_controller_relative_motion.py',
             name='relative_motion',
             output='screen',
-            parameters=[{ "velocity_scale_xy": 1.0, "velocity_scale_z": 3.0, "control_period": 0.01 }]
+            parameters=[{ "velocity_scale_xy": 1.0, "velocity_scale_z": 3.0, "control_period": 0.01,
+                          "pull_pattern": LaunchConfiguration('pull_pattern'),
+                          "pull_duration": ParameterValue(LaunchConfiguration('pull_duration'), value_type=float) }]
         ),
 
         Node(

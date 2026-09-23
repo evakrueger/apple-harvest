@@ -18,7 +18,7 @@ class PickController(Node):
         super().__init__('pick_controller')
         
         self.goal= 0.0 #N
-        self.max_velocity = 0.2 # * 0.6 m/s
+        self.max_velocity = 0.14 # m/s (Servo speed_units); matches pull_twist's measured real pull speed
         self.vel_cmd = Vector3() # * 0.6 m/s
         self.min_tension = 10.0
 

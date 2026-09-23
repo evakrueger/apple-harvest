@@ -12,6 +12,8 @@ from rclpy.callback_groups import ReentrantCallbackGroup
 from std_srvs.srv import Empty, Trigger
 from std_msgs.msg import Float32MultiArray, Int32, Float32
 from geometry_msgs.msg import TwistStamped, WrenchStamped  # to publish to the UR5
+from harvest_interfaces.srv import SetValue
+from rcl_interfaces.msg import ParameterDescriptor
 import numpy as np
 from eva_vacuum_test import PumpIO # my vacuum control file
 from collections import deque
@@ -31,8 +33,22 @@ PRESSURE_THRESHOLD = -56    # this is a "good enough" pressure to reach, to cont
 PRESSURE_CONTROLLER_TIMEOUT = 5.0   # waits 5 seconds before starting picking motion
 
 PICKING_TIME = 2.0
-TWIST_SPEED = 3.1 # must be under 3.14
-PULL_SPEED = 1.5
+
+# --- Pull pattern: what runs during 'release' (the picking motion after a good grasp).
+# We hand off to an external controller node (all launched in arm_control.launch.py):
+# we call its start service, stop publishing our own twist, and call its stop service when release ends.
+# If its service isn't up when release starts, the pick goes to 'failed'.
+# Select with the ROS param `pull_pattern`; override the duration with `pull_duration` (seconds).
+# name: (start service, stop service, default duration [s]; pull_twist matches the old hard-coded pull,
+#        the rest are taken from start_harvest.py's pick_controller())
+PULL_CONTROLLERS = {
+    'pull_twist_controller': ('/pull_twist/start_controller', '/pull_twist/stop_controller', PICKING_TIME),
+    'linear_controller':     ('/linear/start_controller', '/linear/stop_controller', 10.0),
+    'heuristic_controller':  ('/start_controller', '/stop_controller', 10.0),
+    'stiffness_controller':  ('/start_stiffness_controller', '/stop_stiffness_controller', 5.0),
+}
+DEFAULT_PULL_PATTERN = 'pull_twist_controller'
+HEURISTIC_PULL_GOAL = 20.0  # N, force goal for heuristic_controller (same as start_harvest.py's configure_controller)
 
 # --- Wiggle: cycles small nudges while 'pick' waits on vacuum pressure, instead of
 # sitting still. Treats the apple as a sphere: nudge up+forward while tilting down,
@@ -124,6 +140,32 @@ class FlexToFListener(Node):
         self.stop_service  = self.create_service(Empty, 'relative_motion/stop_controller', self.handle_stop)
         self.status_service = self.create_service(Trigger, 'relative_motion/get_status', self.handle_get_status)
         self.release_service = self.create_service(Empty, 'relative_motion/release_apple', self.handle_release_apple)
+
+        # --- pull pattern (see PULL_CONTROLLERS)
+        self.pull_pattern = self.declare_parameter('pull_pattern', DEFAULT_PULL_PATTERN).value
+        if self.pull_pattern not in PULL_CONTROLLERS:
+            self.get_logger().error(f"Unknown pull_pattern '{self.pull_pattern}' (options: {list(PULL_CONTROLLERS)}); using '{DEFAULT_PULL_PATTERN}'")
+            self.pull_pattern = DEFAULT_PULL_PATTERN
+        start_srv, stop_srv, default_duration = PULL_CONTROLLERS[self.pull_pattern]
+        self.pull_duration = float(self.declare_parameter('pull_duration', -1.0).value)
+        if self.pull_duration < 0:  # negative = use this pattern's default
+            self.pull_duration = default_duration
+        self.pull_active = False  # True while the external pull controller is driving the arm
+        self.pull_start_cli = self.create_client(Empty, start_srv, callback_group=self.cbgroup)
+        self.pull_stop_cli = self.create_client(Empty, stop_srv, callback_group=self.cbgroup)
+        if self.pull_pattern == 'heuristic_controller':
+            self.pull_goal_cli = self.create_client(SetValue, '/set_goal', callback_group=self.cbgroup)
+        if not self.pull_start_cli.wait_for_service(timeout_sec=5.0):
+            self.get_logger().warn(f"Pull controller service '{start_srv}' not available yet -- is {self.pull_pattern} running?")
+        self.get_logger().info(f"Pull pattern: {self.pull_pattern} for {self.pull_duration:.1f} s")
+
+        # Expose the controller switches as read-only params so start_harvest can record them in metadata.
+        # They mirror the module constants above (edit those to change behavior, not these params).
+        read_only = ParameterDescriptor(read_only=True)
+        self.declare_parameter('flex_controller', FLEX_CONTROLLER, read_only)
+        self.declare_parameter('tof_controller', TOF_CONTROLLER, read_only)
+        self.declare_parameter('pressure_controller', PRESSURE_CONTROLLER, read_only)
+        self.declare_parameter('resolved_pull_duration', self.pull_duration, read_only)
 
         self.get_logger().info('FlexToFListener initialized (start/stop services created).')
 
@@ -218,8 +260,8 @@ class FlexToFListener(Node):
             self.controller = 'default'
             self.get_logger().info("Controller started.")
 
-            # --- AUTO STOP AFTER 20 SECONDS ---
-            stop_time = 20.0  # seconds
+            # --- AUTO STOP AFTER 20 SECONDS (plus however much longer the pull is than the default 2 s) ---
+            stop_time = 20.0 + max(0.0, self.pull_duration - PICKING_TIME)  # seconds
             self.get_logger().info(f"Controller will auto-stop in {stop_time} seconds")
 
             # If for some reason a leftover timer exists, destroy it first
@@ -260,6 +302,7 @@ class FlexToFListener(Node):
         if self.running:
             self.get_logger().info("stop_controller: stopping controller, publishing zero twist, and turning off vacuum...")
             self.running = False
+            self._stop_pull()
             # ... existing shutdown actions ...
 
             # destroy any pending auto-stop timer
@@ -287,6 +330,46 @@ class FlexToFListener(Node):
         self.pump.vacuum_off()
         return response
 
+
+    # --- PULL HAND-OFF ---
+    # Service calls are fire-and-forget (call_async, no spinning) since these run inside
+    # control_loop / service callbacks and blocking there would deadlock the executor.
+    def _enter_release(self, now):
+        self.state = 'release' # move on to the picking motion
+        if RF_CONTROLLER and self.rf_model_loaded:
+            for key in self._rf_hist:
+                self._rf_hist[key].clear()
+        self.release_start_time = now
+        # the pull controller takes over commanding; clear our smoothing state so the one
+        # zero command we publish on 'done'/'failed' is actually zero
+        self.prev_cmd_x = self.prev_cmd_y = self.prev_cmd_z = 0.0
+        ready = self.pull_start_cli.service_is_ready() and (
+            self.pull_pattern != 'heuristic_controller' or self.pull_goal_cli.service_is_ready())
+        if not ready:
+            self.get_logger().error(f"Release: {self.pull_pattern} is not available -- no pull performed, marking pick failed")
+            self.pump.vacuum_off()
+            self.state = 'failed'
+            return
+        self.get_logger().info(f"Release: handing off to {self.pull_pattern} for {self.pull_duration:.1f} s")
+        self.pull_active = True
+        if self.pull_pattern == 'heuristic_controller':
+            # goal must be set before starting (it divides by the goal), so start once set_goal returns
+            req = SetValue.Request()
+            req.val = HEURISTIC_PULL_GOAL
+            self.pull_goal_cli.call_async(req).add_done_callback(lambda _: self._call_pull_start())
+        else:
+            self._call_pull_start()
+
+    def _call_pull_start(self):
+        # skip if release already ended while waiting on set_goal
+        if self.pull_active:
+            self.pull_start_cli.call_async(Empty.Request())
+
+    def _stop_pull(self):
+        if self.pull_active:
+            self.get_logger().info(f"Stopping {self.pull_pattern}")
+            self.pull_active = False
+            self.pull_stop_cli.call_async(Empty.Request())
 
     # --- SUBSCRIBERS & PUBLISHERS (unchanged) ---
     def flex_callback(self, msg):
@@ -519,11 +602,7 @@ class FlexToFListener(Node):
                 if PRESSURE_CONTROLLER:
                     if pressure <= PRESSURE_THRESHOLD:
                         self.get_logger().info(f'Grasp vacuum succeeded (pressure={pressure})')
-                        self.state = 'release' # move on to the picking motion
-                        if RF_CONTROLLER and self.rf_model_loaded:
-                            for key in self._rf_hist:
-                                self._rf_hist[key].clear()
-                        self.release_start_time = now
+                        self._enter_release(now)
                     elif elapsed > PRESSURE_CONTROLLER_TIMEOUT:
                         self.get_logger().warn(f'Grasp failed: timeout (pressure={pressure})')
                         self.pump.vacuum_off()
@@ -531,11 +610,7 @@ class FlexToFListener(Node):
                 # Timeout
                 elif elapsed > PRESSURE_CONTROLLER_TIMEOUT:
                     self.get_logger().warn(f'Grasp completed: timeout (pressure={pressure})')
-                    self.state = 'release' # move on to the picking motion
-                    if RF_CONTROLLER and self.rf_model_loaded:
-                        for key in self._rf_hist:
-                            self._rf_hist[key].clear()
-                    self.release_start_time = now
+                    self._enter_release(now)
             elif self.state == 'release':
                 elapsed_release = now - self.release_start_time
                 self.get_logger().debug(f"RELEASE elapsed={elapsed_release:.2f}")
@@ -554,22 +629,25 @@ class FlexToFListener(Node):
 
                             if label == 1:
                                 self.get_logger().info("RF SUCCESS → done")
+                                self._stop_pull()
                                 self.state = "done"
                                 return
 
                             elif label in (2, 3):
                                 self.get_logger().warn("RF FAILURE → abort")
+                                self._stop_pull()
                                 self.pump.vacuum_off()
                                 self.state = "failed"
                                 return
 
                 # Pulling back (picking motion)
-                if elapsed_release < PICKING_TIME:
+                if elapsed_release < self.pull_duration:
                     self.get_logger().debug("retreating...")
                 # Final state resolution -- no untwist/settle phase; go_to_home() in
                 # start_harvest.py handles returning the arm to a sane pose afterward.
                 else:
                     self.get_logger().info("Entire controller done")
+                    self._stop_pull()
                     self.state = 'done'
 
         cmd_wz = 0.0   # default: no rotation
@@ -584,10 +662,8 @@ class FlexToFListener(Node):
             cmd_vx, cmd_vy = 0.0, 0.0
             cmd_vz = -0.1 * self.velocity_scale_factor_z
         elif self.state == 'release':
-            # by construction, still being in 'release' here means elapsed_release < PICKING_TIME
-            # (the state-transition block above already moves on to 'done' once it isn't)
-            cmd_vx, cmd_vy, cmd_vz = 0.0, 0.0, -PULL_SPEED
-            cmd_wz = -1*TWIST_SPEED
+            # external pull controller owns /servo_node/delta_twist_cmds; don't fight it
+            return
         elif self.state == 'pick' and WIGGLE_ENABLED:
             elapsed_pick = now - self.pick_start_time
             cmd_vx, cmd_vy, cmd_vz, cmd_wx, cmd_wy = self._compute_wiggle(elapsed_pick)
