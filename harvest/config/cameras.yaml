@@ -1,0 +1,54 @@
+# Camera setup for the harvest system -- change cameras here, not in code.
+#
+# Read by:
+#   launch_vision.launch.py / realsense_topics.launch.py  -> which camera nodes to start and how
+#   start_harvest.py                                      -> which image topics to record
+#
+# Each camera's topics are named after its key below:
+#   realsense:  /<name>_image_raw, /<name>_camera_info, /<name>_aligned_depth_image_raw,
+#               /<name>_aligned_depth_camera_info, /<name>_depth_image_raw, /<name>_depth_camera_info,
+#               /<name>_points
+#   usb_cam:    /<name>_image_raw, /<name>_camera_info
+#   palm_camera:/<name>_image_raw
+# `record: true` adds /<name>_image_raw to the bag recorded during the pick.
+
+cameras:
+  realsense:
+    type: realsense
+    enabled: true
+    serial: '040322070611'   # D435i
+    align_depth: true
+    pointcloud: true
+    publish_tf: false        # URDF handles the mount
+    record: true
+
+  # Second RealSense (not currently mounted). Set its serial before enabling -- each camera needs its own.
+  base_realsense:
+    type: realsense
+    enabled: false
+    serial: ''
+    align_depth: true
+    pointcloud: true
+    publish_tf: false
+    record: true
+
+  usb_cam:
+    type: usb_cam
+    enabled: true
+    # Logitech 046d:0809. Any /dev path or symlink works. After installing config/99-harvest-devices.rules
+    # this can be /dev/usb_cam, which follows the camera model instead of this one unit's serial.
+    device: /dev/v4l/by-id/usb-046d_0809_0BC94709-video-index0
+    record: true
+
+  # Gripper palm camera (robot_custom_hardware/gripper_palm_camera). Also feeds visual_servo.
+  palm_camera:
+    type: palm_camera
+    enabled: false
+    # Prefer a path that follows the camera to any port: /dev/v4l/by-id/<...>-video-index0 (see `ls /dev/v4l/by-id/`),
+    # or /dev/palm_camera after adding its rule to config/99-harvest-devices.rules.
+    # A number N means /dev/videoN, which depends on plug-in order.
+    device: 0
+    record: true
+
+# RealSense camera used by apple_prediction
+prediction_camera: realsense

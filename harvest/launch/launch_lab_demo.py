@@ -35,7 +35,7 @@ def generate_launch_description():
          get_package_share_directory('harvest'), 'launch'),
          '/launch_vision.launch.py']),
       launch_arguments ={'prediction_distance_max': '1.5', 'vservo_yolo_conf': '0.5', 'vservo_max_vel':
-                         '0.3', 'palm_camera_device_num': '0'}.items()
+                         '0.3'}.items()  # palm camera device: harvest/config/cameras.yaml
    )   
 
    return LaunchDescription( [

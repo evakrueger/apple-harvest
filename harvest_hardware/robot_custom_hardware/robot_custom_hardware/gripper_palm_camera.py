@@ -9,6 +9,7 @@ from sensor_msgs.msg import Image
 from cv_bridge import CvBridge
 import cv2
 import numpy as np
+import os
 
 class GripperPalmCamera(Node):
     def __init__(self, resolution=(800,600), target_fr=30):
@@ -21,8 +22,15 @@ class GripperPalmCamera(Node):
         self.bridge = CvBridge()
 
         # camera vars 
+        # device path (e.g. /dev/v4l/by-id/..., or a udev name like /dev/palm_camera) -- follows the camera
+        # to any port. If empty, falls back to palm_camera_device_num (the N in /dev/videoN).
+        self.declare_parameter("palm_camera_device", "")
         self.declare_parameter("palm_camera_device_num", 2)
-        self.device = self.get_parameter("palm_camera_device_num").get_parameter_value().integer_value
+        device_path = self.get_parameter("palm_camera_device").get_parameter_value().string_value
+        if device_path:
+            self.device = os.path.realpath(device_path)  # resolve by-id / udev symlinks to /dev/videoN
+        else:
+            self.device = self.get_parameter("palm_camera_device_num").get_parameter_value().integer_value
         self.resolution = resolution
         self.target_fr = target_fr
         self.camera = None
@@ -30,14 +38,16 @@ class GripperPalmCamera(Node):
         # camera setup
         camera_setup_result = self.create_camera()
         if not camera_setup_result:
-            self.get_logger().error("Failed to setup camera with device number: {0}".format(self.device)) 
+            self.get_logger().error("Failed to setup camera with device: {0}".format(self.device)) 
         else:
-            self.get_logger().info("Succesfully setup camera with device number: {0}".format(self.device)) 
+            self.get_logger().info("Succesfully setup camera with device: {0}".format(self.device)) 
 
         
     def create_camera(self):
         try: 
             self.camera = cv2.VideoCapture(self.device, cv2.CAP_V4L2)
+            if not self.camera.isOpened():
+                return False
             self.camera.set(cv2.CAP_PROP_FRAME_WIDTH, self.resolution[0])
             self.camera.set(cv2.CAP_PROP_FRAME_HEIGHT, self.resolution[1])
             self.camera.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter_fourcc('M', 'J', 'P', 'G'))

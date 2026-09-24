@@ -24,6 +24,7 @@ import yaml
 import copy
 import re
 from pathlib import Path
+from harvest import cameras
 
 def get_data_storage_dir():
     # 1. Find this file’s folder:
@@ -146,8 +147,8 @@ class StartHarvest(Node):
         # I use topics below as the ones being recorded during my relative_motion_controller actions
         self.relative_motion_controller_topics = [
             '/tof_sensor_data', '/flex_sensor_data', '/joint_states', '/tool_pose', '/servo_node/delta_twist_cmds',
-            '/force_torque_sensor_broadcaster/wrench', '/vacuum_pressure', '/image_raw', '/camera/mast_camera/color/image_raw'
-        ]
+            '/force_torque_sensor_broadcaster/wrench', '/vacuum_pressure',
+        ] + cameras.recorded_image_topics(cameras.load_config())  # e.g. /usb_cam_image_raw, /realsense_image_raw (see harvest/config/cameras.yaml)
 
         # Batch directories
         self.batch_dir, self.batch_number = self.create_new_batch_directory(self.base_data_dir)
@@ -631,8 +632,8 @@ class StartHarvest(Node):
         #     base_dir = self.batch_dir + f'apple_{0}/'
 
             # Stage 3: Approach apple
-            input(f'Hit enter to start with apple {idx}')
-            self.get_logger().info(f'Approaching apple {idx}: Coord {coord}')
+            # input(f'Hit enter to start with apple {idx}')
+            # self.get_logger().info(f'Approaching apple {idx}: Coord {coord}')
             # if self.use_optimal_trajectory:
             #     waypoints = self.call_coord_to_traj(coord)
             #     self.trigger_arm_mover(waypoints)
@@ -641,7 +642,7 @@ class StartHarvest(Node):
 
         # Stage 4: pick controller
         if self.enable_picking:
-            input('Done with approach, hit enter to start pressure servoing and pick controller')
+            input('Hit continue to start pressure servoing and pick controller')
             def pick_action():
                 if self.enable_picking:
                     self.pick_controller()
@@ -660,7 +661,7 @@ class StartHarvest(Node):
 
             if self.PICK_PATTERN == 'eva-relative-motion':
                 if self.last_pick_state == 'done':
-                    input('Press enter to release apple')
+                    input('Press continue to release apple')
                     self.future = self.eva_controller_release_cli.call_async(Empty.Request())
                     rclpy.spin_until_future_complete(self, self.future)
                 else:

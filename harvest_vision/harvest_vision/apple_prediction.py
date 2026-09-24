@@ -37,6 +37,7 @@ class ApplePredictionFromTopics(Node):
 
         # --- params ---
         self.declare_parameter("camera_ns", "camera/mast_camera")
+        self.declare_parameter("topic_prefix", "")  # if set, use /<prefix>_image_raw etc. (see harvest/config/cameras.yaml) instead of camera_ns
         self.declare_parameter("use_aligned_depth", True)
         self.declare_parameter("source_frame", "mast_camera_color_optical_frame")
         self.declare_parameter("target_frame", "world")
@@ -91,13 +92,23 @@ class ApplePredictionFromTopics(Node):
         # --- subs + sync ---
         self.bridge = CvBridge()
 
-        self.color_topic = f"/{self.ns}/color/image_raw"
-        if self.use_aligned:
-            self.depth_topic = f"/{self.ns}/aligned_depth_to_color/image_raw"
-            self.cinfo_topic = f"/{self.ns}/color/camera_info"
+        prefix = self.get_parameter("topic_prefix").value
+        if prefix:
+            self.color_topic = f"/{prefix}_image_raw"
+            if self.use_aligned:
+                self.depth_topic = f"/{prefix}_aligned_depth_image_raw"
+                self.cinfo_topic = f"/{prefix}_camera_info"
+            else:
+                self.depth_topic = f"/{prefix}_depth_image_raw"
+                self.cinfo_topic = f"/{prefix}_depth_camera_info"
         else:
-            self.depth_topic = f"/{self.ns}/depth/image_rect_raw"
-            self.cinfo_topic = f"/{self.ns}/depth/camera_info"
+            self.color_topic = f"/{self.ns}/color/image_raw"
+            if self.use_aligned:
+                self.depth_topic = f"/{self.ns}/aligned_depth_to_color/image_raw"
+                self.cinfo_topic = f"/{self.ns}/color/camera_info"
+            else:
+                self.depth_topic = f"/{self.ns}/depth/image_rect_raw"
+                self.cinfo_topic = f"/{self.ns}/depth/camera_info"
 
         # IMPORTANT: keep strong refs
         self.color_sub = Subscriber(self, Image, self.color_topic, qos_profile=qos_profile_sensor_data)

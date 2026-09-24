@@ -4,6 +4,7 @@
 numpy
 pyyaml
 matplotlib
+pyqtgraph
 scipy
 opencv-python
 cv-bridge

@@ -56,6 +56,14 @@ def generate_launch_description():
     declared_arguments.append(DeclareLaunchArgument('traj_time_step', default_value="0.05", 
                                   description="Time step (in seconds) between UR5 joint trajectory waypoints."))
 
+    ### micro-ROS agent (ESP32)
+    # by-id path follows the ESP32 to any USB port, unlike /dev/ttyUSB0 (which depends on plug-in order).
+    # Its CH340 chip has no serial number, so this is only unique while it's the only CH340 device plugged in;
+    # with more than one, use its /dev/serial/by-path/... entry (tied to a physical port) instead.
+    # /dev/esp32 works too after installing harvest/config/99-harvest-devices.rules.
+    declared_arguments.append(DeclareLaunchArgument('esp32_device', default_value="/dev/serial/by-id/usb-1a86_USB_Serial-if00-port0",
+                                  description="Serial device of the ESP32 running micro-ROS."))
+
     # Path to UR5 launch files
     ur_driver_launch_path = os.path.join(
         get_package_share_directory('ur_robot_driver'),
@@ -224,9 +232,9 @@ def generate_launch_description():
         ExecuteProcess(
             cmd=[
                 '/bin/bash', '-c',
-                'source /opt/ros/humble/setup.bash && '
-                'source ~/uros_ws/install/local_setup.bash && '
-                'ros2 run micro_ros_agent micro_ros_agent serial --dev /dev/ttyUSB0'
+                ['source /opt/ros/humble/setup.bash && '
+                 'source ~/uros_ws/install/local_setup.bash && '
+                 'ros2 run micro_ros_agent micro_ros_agent serial --dev ', LaunchConfiguration('esp32_device')]
             ],
             output='screen'
         ),

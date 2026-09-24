@@ -16,6 +16,12 @@ class PumpIO:
         self.vacuum_voltage = None
         self._logged_analog_pins = False
 
+        # Manual override (e.g. from harvest_gui.py via relative_motion's vacuum_override param):
+        # None = the code is in control; True/False = vacuum forced on/off whatever the code asks for.
+        # `requested` is what the code last asked for, restored when the override is cleared.
+        self.override = None
+        self.requested = False
+
         # Subscribe to IOStates to get analog input
         self.node.create_subscription(IOStates, '/io_and_status_controller/io_states', self.io_callback, 10)
 
@@ -66,17 +72,26 @@ class PumpIO:
 
         return -vacuum_level
 
+    def _set_vacuum(self, state: bool):
+        self.requested = state
+        self.set_do(self.DO_VACUUM, state if self.override is None else self.override)
+
+    def set_override(self, override):
+        """Force the vacuum on (True) or off (False) regardless of vacuum_on/vacuum_off calls; None hands control back."""
+        self.override = override
+        self.set_do(self.DO_VACUUM, self.requested if override is None else override)
+
     def vacuum_on(self):
-        return self.set_do(self.DO_VACUUM, True)
+        return self._set_vacuum(True)
 
     def vacuum_off_and_blowoff(self):
-        self.set_do(self.DO_VACUUM, False)
+        self._set_vacuum(False)
         self.set_do(self.DO_BLOWOFF, True)
         self.node.get_clock().sleep_for(rclpy.duration.Duration(seconds=0.2))
         self.set_do(self.DO_BLOWOFF, False)
 
     def vacuum_off(self):
-        self.set_do(self.DO_VACUUM, False)
+        self._set_vacuum(False)
         self.set_do(self.DO_BLOWOFF, False)
 
     def disable_energy_saving(self):

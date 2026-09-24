@@ -18,6 +18,11 @@
   <depend>harvest_interfaces</depend>
   <depend>geometry_msgs</depend>
   <depend>moveit_ros_planning_interface</depend>
+  <exec_depend>python3-pyqt5</exec_depend>
+  <exec_depend>python3-pyqtgraph</exec_depend>
+  <exec_depend>controller_manager_msgs</exec_depend>
+  <exec_depend>cv_bridge</exec_depend>
+  <exec_depend>ur_msgs</exec_depend>
 
   <test_depend>ament_lint_auto</test_depend>
   <test_depend>ament_lint_common</test_depend>

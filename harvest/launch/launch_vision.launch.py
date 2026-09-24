@@ -7,8 +7,8 @@ from launch.substitutions import LaunchConfiguration
 from launch.substitutions import Command, FindExecutable, LaunchConfiguration, PathJoinSubstitution
 from launch_ros.substitutions import FindPackageShare
 import launch_ros.actions
-from launch.actions import IncludeLaunchDescription
-from launch.launch_description_sources import PythonLaunchDescriptionSource
+from launch.actions import OpaqueFunction
+from harvest import cameras
 
 def generate_launch_description():
     declared_arguments = []
@@ -41,23 +41,21 @@ def generate_launch_description():
     declared_arguments.append(DeclareLaunchArgument("vservo_max_vel", default_value="0.6", 
                                   description="Maximum velocity that arm end effector can move during visual servo."))
     
-    ### palm camera publisher node parameters
-    declared_arguments.append(DeclareLaunchArgument("palm_camera_device_num", default_value="2", 
-                                  description="Device number for palm RGB camer in gripper."))
+    ### cameras (which cameras run, devices/serials, topic names) -- see harvest/config/cameras.yaml
+    declared_arguments.append(DeclareLaunchArgument("cameras_config", default_value=cameras.default_config_path(),
+                                  description="Camera config file (devices, serials, which cameras are enabled)."))
 
     ### getting paths to yolo_networks
     declared_arguments.append(DeclareLaunchArgument('prediction_model_path', default_value=[PathJoinSubstitution([FindPackageShare("harvest_vision"), "yolo_networks", LaunchConfiguration("prediction_model")])]))
     declared_arguments.append(DeclareLaunchArgument('vservo_model_path', default_value=[PathJoinSubstitution([FindPackageShare("harvest_vision"), "yolo_networks", LaunchConfiguration("vservo_model")])]))
     
-    # Reasense launch file path
-    realsense_launch_path = os.path.join(
-        get_package_share_directory('harvest'),
-        'launch',
-        'realsense_topics.launch.py')
-    
-    realsense_topics_node = IncludeLaunchDescription(
-            PythonLaunchDescriptionSource(realsense_launch_path),
-    )
+    return LaunchDescription(declared_arguments + [OpaqueFunction(function=launch_setup)])
+
+
+def launch_setup(context):
+    config = cameras.load_config(LaunchConfiguration("cameras_config").perform(context))
+    prediction_camera = config['prediction_camera']
+    palm_cameras = [name for name, cam in config['cameras'].items() if cam['type'] == 'palm_camera']
 
     ### Nodes
     apple_prediction_node = launch_ros.actions.Node(
@@ -70,7 +68,9 @@ def generate_launch_description():
                      "prediction_radius_min": LaunchConfiguration("prediction_radius_min"),
                      "prediction_radius_max": LaunchConfiguration("prediction_radius_max"),
                      "prediction_distance_max": LaunchConfiguration("prediction_distance_max"),
-                     "scan_data_path": LaunchConfiguration("scan_data_path")
+                     "scan_data_path": LaunchConfiguration("scan_data_path"),
+                     "topic_prefix": prediction_camera,
+                     "source_frame": f"{prediction_camera}_color_optical_frame",
                       }
                 ])
     
@@ -85,30 +85,9 @@ def generate_launch_description():
                      "vservo_smoothing_factor": LaunchConfiguration("vservo_smoothing_factor"),
                      "vservo_max_vel": LaunchConfiguration("vservo_max_vel")
                       }
-                ])
+                ],
+                # visual_servo reads the palm camera
+                remappings=[(cameras.PALM_CAMERA_NODE_TOPIC, cameras.topic(name)) for name in palm_cameras[:1]])
 
-    palm_camera_node = launch_ros.actions.Node(
-                package="robot_custom_hardware",
-                executable="gripper_palm_camera",
-                name="gripper_palm_camera",
-                parameters=[
-                    {"palm_camera_device_num": LaunchConfiguration("palm_camera_device_num")
-                      }
-                ])
-    
-    usb_cam_node = launch_ros.actions.Node(
-                package="usb_cam",
-                executable="usb_cam_node_exe",
-                name="usb_cam_node",
-                # resolve by-id symlink here; usb_cam mangles relative symlinks into /dev/../../videoN
-                parameters=[{"video_device": os.path.realpath("/dev/v4l/by-id/usb-046d_0809_0BC94709-video-index0")}],
-                output="screen"
-            )
-    
-    return LaunchDescription(declared_arguments + [
-                             apple_prediction_node, 
-                             vservo_node, 
-                            #  palm_camera_node,
-                            usb_cam_node,
-                             realsense_topics_node
-    ])
+    # realsense / usb_cam / palm_camera nodes for every camera enabled in cameras.yaml
+    return [apple_prediction_node, vservo_node] + cameras.camera_nodes(config)

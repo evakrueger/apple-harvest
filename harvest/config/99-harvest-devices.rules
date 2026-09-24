@@ -1,0 +1,17 @@
+# Stable device names for the harvest USB devices, independent of plug-in order (/dev/videoN, /dev/ttyUSBN).
+# Install (once per machine):
+#   sudo cp 99-harvest-devices.rules /etc/udev/rules.d/
+#   sudo udevadm control --reload-rules && sudo udevadm trigger
+# then use the names below in cameras.yaml (device:) and arm_control.launch.py (esp32_device:=).
+# These match on the device model, so they follow the device to any port -- but only one device of
+# each model can be plugged in at a time.
+
+# Logitech 046d:0809 (usb_cam) -> /dev/usb_cam
+SUBSYSTEM=="video4linux", ATTRS{idVendor}=="046d", ATTRS{idProduct}=="0809", ATTR{index}=="0", SYMLINK+="usb_cam"
+
+# ESP32 (micro-ROS agent) on its CH340 USB-serial chip 1a86:7523 -> /dev/esp32
+SUBSYSTEM=="tty", ATTRS{idVendor}=="1a86", ATTRS{idProduct}=="7523", SYMLINK+="esp32"
+
+# Palm camera -> /dev/palm_camera. Fill in its vendor/product IDs (`lsusb`, or
+# `udevadm info -q property -n /dev/videoN | grep -E "ID_VENDOR_ID|ID_MODEL_ID"`) and uncomment:
+# SUBSYSTEM=="video4linux", ATTRS{idVendor}=="xxxx", ATTRS{idProduct}=="xxxx", ATTR{index}=="0", SYMLINK+="palm_camera"

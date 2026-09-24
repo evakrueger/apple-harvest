@@ -1,6 +1,11 @@
 #!/usr/bin/env python3
 """
-FlexToFListener (edited to support start/stop services)
+Relative-motion pick controller.
+
+Servos the gripper onto the apple using the flex sensors (Kalman + PID), approaches using ToF,
+grasps with vacuum (wiggling until pressure engages), then hands the pull off to an external
+pull controller (see PULL_CONTROLLERS). Driven by start_harvest.py through the
+relative_motion/* services.
 """
 
 # ROS
@@ -13,15 +18,12 @@ from std_srvs.srv import Empty, Trigger
 from std_msgs.msg import Float32MultiArray, Int32, Float32
 from geometry_msgs.msg import TwistStamped, WrenchStamped  # to publish to the UR5
 from harvest_interfaces.srv import SetValue
-from rcl_interfaces.msg import ParameterDescriptor
+from rcl_interfaces.msg import ParameterDescriptor, SetParametersResult
+from rclpy.parameter import Parameter
 import numpy as np
 from eva_vacuum_test import PumpIO # my vacuum control file
+from rf_pick_classifier import RFPickClassifier
 from collections import deque
-import joblib
-from ament_index_python.packages import get_package_share_directory
-from pathlib import Path
-from rclpy.qos import QoSProfile
-from message_filters import ApproximateTimeSynchronizer, Subscriber
 
 
 FLEX_CONTROLLER = True  # change to False to stop flex sensor servoing
@@ -48,17 +50,21 @@ PULL_CONTROLLERS = {
     'stiffness_controller':  ('/start_stiffness_controller', '/stop_stiffness_controller', 5.0),
 }
 DEFAULT_PULL_PATTERN = 'pull_twist_controller'
+# vacuum_override param values -> PumpIO.set_override (manual failure injection from harvest_gui.py)
+VACUUM_OVERRIDES = {'auto': None, 'on': True, 'off': False}
 HEURISTIC_PULL_GOAL = 20.0  # N, force goal for heuristic_controller (same as start_harvest.py's configure_controller)
+
+AUTO_STOP_TIME = 20.0  # s, safety auto-stop after start (extended by however much the pull exceeds PICKING_TIME)
 
 # --- Wiggle: cycles small nudges while 'pick' waits on vacuum pressure, instead of
 # sitting still. Treats the apple as a sphere: nudge up+forward while tilting down,
 # return; down+forward while tilting up, return; left+forward tilting right, return;
 # right+forward tilting left, return; then repeats until pressure engages or timeout.
-# Axis mapping is a GUESS (Servo runs in base_link frame here, not tool frame) --
-# verify on the robot and flip the *_SIGN constants (not the axis assignment) if a
-# direction comes out backwards. cmd_vx = vertical, cmd_vy = lateral, angular.y pairs
-# with vertical (pitch), angular.x pairs with lateral (roll), always opposite in sign
-# to the linear nudge per the pattern above.
+# Axis mapping is a GUESS (commands are sent in the tool0 frame) -- verify on the robot
+# and flip the *_SIGN constants (not the axis assignment) if a direction comes out
+# backwards. cmd_vx = vertical, cmd_vy = lateral, angular.y pairs with vertical (pitch),
+# angular.x pairs with lateral (roll), always opposite in sign to the linear nudge per
+# the pattern above.
 WIGGLE_ENABLED = True
 WIGGLE_MAGNITUDE = 0.15        # m/s, linear nudge speed -- slow and minor by design
 WIGGLE_TILT_MAGNITUDE = 2.0    # rad/s, tilt speed (independent units from the linear nudge)
@@ -78,62 +84,53 @@ _WIGGLE_PHASES = [
     ( 0,  1, -1),  # return to original
 ]
 
-class FlexToFListener(Node):
-    def __init__(self, calibrate=False):
-        super().__init__('flex_tof_listener')
+class RelativeMotionController(Node):
+    def __init__(self):
+        super().__init__('relative_motion')
         self.cbgroup = ReentrantCallbackGroup()
-        self.calibrate = calibrate
 
         # --- RUNNING FLAG (start/stop) ---
-        self.running = False  # <-- ADDED: gate control loop
+        self.running = False  # gates the control loop
 
         # State machine: start in approach
         self.state = 'approach'
+        self.controller = 'default'  # 'default' until ToF is close enough, then 'relative_controller'
         self.position_threshold = 0.5
         self.tof_servo_threshold = 45
         self.tof_relative_motion_threshold = 45
 
-        # Scale & timing
-        self.velocity_scale_factor_xy = 1.0
-        self.velocity_scale_factor_z = 3.0
-        self.control_period = 0.01  # 100 Hz
+        # Scale & timing (set from arm_control.launch.py)
+        self.velocity_scale_factor_xy = self.declare_parameter('velocity_scale_xy', 1.0).value
+        self.velocity_scale_factor_z = self.declare_parameter('velocity_scale_z', 3.0).value
+        self.control_period = self.declare_parameter('control_period', 0.01).value  # 100 Hz
 
         # Sensor placeholders
         self.latest_flex = None
         self.latest_tof = None
         self.latest_pressure = None
         self.latest_force = None
+        self.tof_history = deque(maxlen=15)  # last 15 ToF readings
 
         self._auto_stop_timer = None
 
         # Publishers & Subscribers
         self.apple_pub = self.create_publisher(Float32MultiArray, '/position_apple', 10)
         self.gripper_pub = self.create_publisher(TwistStamped, '/servo_node/delta_twist_cmds', 10)
-        self.pressure_pub = self.create_publisher(Float32, '/suction_pressure', 10)
         self.create_subscription(Float32MultiArray, '/flex_sensor_data', self.flex_callback, 10, callback_group=self.cbgroup)
         self.create_subscription(Int32, '/tof_sensor_data', self.tof_callback, 10, callback_group=self.cbgroup)
         self.create_subscription(Float32, '/vacuum_pressure', self.pressure_callback, 10, callback_group=self.cbgroup)
         self.create_subscription(WrenchStamped, '/force_torque_sensor_broadcaster/wrench', self.force_callback, 10, callback_group=self.cbgroup)
 
+        # Filters, PID and command smoothing state (also reset on every start)
+        self._reset_control_state()
+
         # Fixed-rate control loop
-        self.prev_time = self.get_clock().now().nanoseconds * 1e-9
         self.create_timer(self.control_period, self.control_loop, callback_group=self.cbgroup)
-
-        # Filters & PID state
-        self._init_kalman()
-        self._init_pid()
-
-        # Command smoothing state
-        self.prev_cmd_x = self.prev_cmd_y = self.prev_cmd_z = 0.0
 
         # Initialize Pump
         self.pump = PumpIO(self)
         self.pump.disable_energy_saving()
         self.pump.vacuum_off()
-
-        # ToF history buffer (stores last 15 readings)
-        self.tof_history = deque(maxlen=15)
-        self.controller = 'default'
 
         # --- start/stop services
         self.start_service = self.create_service(Empty, 'relative_motion/start_controller', self.handle_start)
@@ -142,21 +139,21 @@ class FlexToFListener(Node):
         self.release_service = self.create_service(Empty, 'relative_motion/release_apple', self.handle_release_apple)
 
         # --- pull pattern (see PULL_CONTROLLERS)
-        self.pull_pattern = self.declare_parameter('pull_pattern', DEFAULT_PULL_PATTERN).value
-        if self.pull_pattern not in PULL_CONTROLLERS:
-            self.get_logger().error(f"Unknown pull_pattern '{self.pull_pattern}' (options: {list(PULL_CONTROLLERS)}); using '{DEFAULT_PULL_PATTERN}'")
-            self.pull_pattern = DEFAULT_PULL_PATTERN
-        start_srv, stop_srv, default_duration = PULL_CONTROLLERS[self.pull_pattern]
-        self.pull_duration = float(self.declare_parameter('pull_duration', -1.0).value)
-        if self.pull_duration < 0:  # negative = use this pattern's default
-            self.pull_duration = default_duration
+        # pull_pattern / pull_duration can also be changed between picks without restarting
+        # (e.g. from harvest_gui.py, or `ros2 param set /relative_motion pull_pattern linear_controller`);
+        # clients for every pattern are created up front so switching just selects a different pair.
+        self.pull_clients = {name: (self.create_client(Empty, start_srv, callback_group=self.cbgroup),
+                                    self.create_client(Empty, stop_srv, callback_group=self.cbgroup))
+                             for name, (start_srv, stop_srv, _) in PULL_CONTROLLERS.items()}
+        self.pull_goal_cli = self.create_client(SetValue, '/set_goal', callback_group=self.cbgroup)
         self.pull_active = False  # True while the external pull controller is driving the arm
-        self.pull_start_cli = self.create_client(Empty, start_srv, callback_group=self.cbgroup)
-        self.pull_stop_cli = self.create_client(Empty, stop_srv, callback_group=self.cbgroup)
-        if self.pull_pattern == 'heuristic_controller':
-            self.pull_goal_cli = self.create_client(SetValue, '/set_goal', callback_group=self.cbgroup)
+        pull_pattern = self.declare_parameter('pull_pattern', DEFAULT_PULL_PATTERN).value
+        if pull_pattern not in PULL_CONTROLLERS:
+            self.get_logger().error(f"Unknown pull_pattern '{pull_pattern}' (options: {list(PULL_CONTROLLERS)}); using '{DEFAULT_PULL_PATTERN}'")
+            pull_pattern = DEFAULT_PULL_PATTERN
+        self._set_pull(pull_pattern, float(self.declare_parameter('pull_duration', -1.0).value))
         if not self.pull_start_cli.wait_for_service(timeout_sec=5.0):
-            self.get_logger().warn(f"Pull controller service '{start_srv}' not available yet -- is {self.pull_pattern} running?")
+            self.get_logger().warn(f"Pull controller service '{PULL_CONTROLLERS[self.pull_pattern][0]}' not available yet -- is {self.pull_pattern} running?")
         self.get_logger().info(f"Pull pattern: {self.pull_pattern} for {self.pull_duration:.1f} s")
 
         # Expose the controller switches as read-only params so start_harvest can record them in metadata.
@@ -165,155 +162,62 @@ class FlexToFListener(Node):
         self.declare_parameter('flex_controller', FLEX_CONTROLLER, read_only)
         self.declare_parameter('tof_controller', TOF_CONTROLLER, read_only)
         self.declare_parameter('pressure_controller', PRESSURE_CONTROLLER, read_only)
-        self.declare_parameter('resolved_pull_duration', self.pull_duration, read_only)
+        # not declared read_only so _sync_resolved_pull_duration can update it; outside writes are rejected in _on_set_parameters
+        self.declare_parameter('resolved_pull_duration', self.pull_duration)
+        self._syncing_resolved = False
+        # 'on'/'off' force the vacuum regardless of the controller (and can be changed mid-pick); 'auto' hands it back
+        self.declare_parameter('vacuum_override', 'auto')
+        self.add_on_set_parameters_callback(self._on_set_parameters)
 
-        self.get_logger().info('FlexToFListener initialized (start/stop services created).')
+        # --- RF pick-outcome classifier (see rf_pick_classifier.py)
+        self.rf = RFPickClassifier(self) if RF_CONTROLLER else None
 
-        # --- RF MODEL SETUP
-        self.rf_model = None
-        self.rf_model_loaded = False
-        
-        # Default safe values (in case load fails)
-        self.rf_window_size = 5 
-        self.rf_feature_order = ["Flex", "Pressure", "Force", "TOF"]
-        self.rf_scaler = None
-
-        self._force_raw_buffer = deque(maxlen=21) # Pre-filter buffer
-
-        # RF inference timing
-        self.last_rf_time = 0.0
-        self.rf_period = 0.009
-
-        self._last_built_X = None # last built aligned window (set by rf_sync_cb)
-
-        # init sliding-window history dict
-        self._rf_hist = {k: deque(maxlen=self.rf_window_size) for k in self.rf_feature_order}
-
-        if RF_CONTROLLER:
-            model_path = Path(
-                get_package_share_directory("harvest_control")
-            ) / "resource" / "rf_pick_classifier.joblib"
-
-            try:
-                data = joblib.load(model_path)
-
-                # 1. Extract Model
-                if isinstance(data, dict) and "model" in data:
-                    self.rf_model = data["model"]
-                elif hasattr(data, "predict"):
-                    self.rf_model = data
-                else:
-                    raise RuntimeError(f"Unrecognized model format: {type(data)}")
-
-                # 2. Extract Metadata (Overwrite defaults)
-                self.rf_window_size = int(data.get("window_size", 5))
-                self.rf_feature_order = list(data.get("feature_order", ["Flex", "Pressure", "Force", "TOF"]))
-                self.rf_scaler = data.get("scalar", None)
-
-                # 3. Initialize History Buffers matching the trained feature order
-                self._rf_hist = {k: deque(maxlen=self.rf_window_size) for k in self.rf_feature_order}
-                self._force_raw_buffer = deque(maxlen=21)
-                
-                self.rf_model_loaded = True
-
-                self.get_logger().info(
-                    f"RF loaded. Window: {self.rf_window_size}, Features: {self.rf_feature_order}"
-                )
-
-            except Exception as e:
-                self.get_logger().error(f"Failed to load RF model. RF Control DISABLED. Error: {e}")
-                self.rf_model_loaded = False
-                # Initialize empty buffers to prevent AttributeErrors later if code tries to access them
-
-        # ----- set up ApproximateTimeSynchronizer subscribers for RF feature alignment -----
-        if RF_CONTROLLER and self.rf_model_loaded:
-            try:
-                qos = QoSProfile(depth=10)
-                # message_filters Subscriber requires node and qos_profile kwarg in ROS2 wrapper
-                self._mf_flex_sub = Subscriber(self, Float32MultiArray, "/flex_sensor_data", qos_profile=qos)
-                self._mf_pressure_sub = Subscriber(self, Float32, "/vacuum_pressure", qos_profile=qos)
-                self._mf_force_sub = Subscriber(self, WrenchStamped, "/force_torque_sensor_broadcaster/wrench", qos_profile=qos)
-                self._mf_tof_sub = Subscriber(self, Int32, "/tof_sensor_data", qos_profile=qos)
-
-                # tune slop to match sensor skew; 0.05 (50 ms) is a good starting point
-                self._rf_sync = ApproximateTimeSynchronizer(
-                    [self._mf_flex_sub, self._mf_pressure_sub, self._mf_force_sub, self._mf_tof_sub],
-                    queue_size=10,
-                    slop=0.05,
-                    allow_headerless=True
-                )
-                self._rf_sync.registerCallback(self.rf_sync_cb)
-                self.get_logger().info("RF ApproximateTimeSynchronizer registered (slop=0.05s).")
-            except Exception as e:
-                self.get_logger().warn(f"Could not create RF ApproximateTimeSynchronizer: {e}")
-            self._rf_sync = None
+        self.get_logger().info('RelativeMotionController initialized (start/stop services created).')
 
 
     # --- SERVICE HANDLERS ---
-    # update handle_start to store the timer and avoid creating duplicates
     def handle_start(self, request, response):
         if not self.running:
             self.get_logger().info("start_controller called: starting controller...")
-            # ... existing startup code ...
+            self._sync_resolved_pull_duration()
+            # start each pick fresh: don't carry filter/PID/smoothing state or loop timing over from the last one
+            self._reset_control_state()
             self.running = True
             self.state = 'approach'
             self.controller = 'default'
             self.get_logger().info("Controller started.")
 
-            # --- AUTO STOP AFTER 20 SECONDS (plus however much longer the pull is than the default 2 s) ---
-            stop_time = 20.0 + max(0.0, self.pull_duration - PICKING_TIME)  # seconds
+            stop_time = AUTO_STOP_TIME + max(0.0, self.pull_duration - PICKING_TIME)  # seconds
             self.get_logger().info(f"Controller will auto-stop in {stop_time} seconds")
-
-            # If for some reason a leftover timer exists, destroy it first
-            if self._auto_stop_timer is not None:
-                try:
-                    self.destroy_timer(self._auto_stop_timer)
-                except Exception:
-                    pass
-                self._auto_stop_timer = None
-
-            # store the timer so we can cancel/destroy it later
+            self._cancel_auto_stop()  # in case a leftover timer exists
             self._auto_stop_timer = self.create_timer(stop_time, self._auto_stop_once, callback_group=self.cbgroup)
         else:
             self.get_logger().info("start_controller called but controller already running.")
         return response
 
-    # change _auto_stop_once so it destroys the timer (one-shot behavior)
     def _auto_stop_once(self):
-        """Stops the controller automatically (called by timer)."""
+        """Stops the controller automatically (one-shot, called by timer)."""
         self.get_logger().info("Auto-stop timer triggered.")
         try:
-            # safe stop
-            req = Empty.Request()
-            self.handle_stop(req, None)
+            self.handle_stop(Empty.Request(), Empty.Response())
         except Exception as e:
             self.get_logger().debug(f"_auto_stop_once: error calling handle_stop: {e}")
+        self._cancel_auto_stop()
 
-        # destroy the timer so it doesn't keep firing
+    def _cancel_auto_stop(self):
         if self._auto_stop_timer is not None:
-            try:
-                self.destroy_timer(self._auto_stop_timer)
-            except Exception as e:
-                self.get_logger().debug(f"Could not destroy auto-stop timer: {e}")
+            self.destroy_timer(self._auto_stop_timer)
             self._auto_stop_timer = None
 
-    # ensure handle_stop also clears/destroys the timer when stopping manually
     def handle_stop(self, request, response):
+        # Stops the control loop and any running pull. Leaves the vacuum as-is (a held apple is
+        # released later via release_apple); failure paths turn the vacuum off themselves.
         if self.running:
-            self.get_logger().info("stop_controller: stopping controller, publishing zero twist, and turning off vacuum...")
+            self.get_logger().info("stop_controller: stopping controller...")
             self.running = False
             self._stop_pull()
-            # ... existing shutdown actions ...
-
-            # destroy any pending auto-stop timer
-            if self._auto_stop_timer is not None:
-                try:
-                    self.destroy_timer(self._auto_stop_timer)
-                except Exception:
-                    pass
-                self._auto_stop_timer = None
-
-            self.get_logger().info("Controller stopped and vacuum disabled.")
+            self._cancel_auto_stop()
+            self.get_logger().info("Controller stopped.")
         else:
             self.get_logger().info("stop_controller called but controller already stopped.")
         return response
@@ -331,18 +235,67 @@ class FlexToFListener(Node):
         return response
 
 
+    # --- STATE ENTRY ---
+    def _enter_pick(self, now):
+        self.state = 'pick'
+        self.pick_start_time = now
+        self.latest_pressure = None
+        self.prev_cmd[:] = 0.0
+        self.get_logger().info(f'Picking: turning on vacuum (tof = {self.latest_tof})')
+        self.pump.vacuum_on()
+
+    # --- PULL SELECTION ---
+    def _set_pull(self, pattern, duration):
+        self.pull_pattern = pattern
+        self.pull_duration = duration if duration >= 0 else PULL_CONTROLLERS[pattern][2]  # negative = this pattern's default
+        self.pull_start_cli, self.pull_stop_cli = self.pull_clients[pattern]
+
+    def _on_set_parameters(self, params):
+        # Runs before a parameter change is stored; applies vacuum_override right away (even mid-pick)
+        # and pull_pattern / pull_duration changes between picks.
+        changes = {p.name: p.value for p in params}
+        if 'resolved_pull_duration' in changes and not self._syncing_resolved:
+            return SetParametersResult(successful=False, reason='resolved_pull_duration is read-only; set pull_duration instead')
+        if 'vacuum_override' in changes:
+            override = changes['vacuum_override']
+            if override not in VACUUM_OVERRIDES:
+                return SetParametersResult(successful=False, reason=f"vacuum_override must be one of {list(VACUUM_OVERRIDES)}")
+            if len(changes) > 1:  # so a rejected pull change can't leave the vacuum half-applied
+                return SetParametersResult(successful=False, reason='set vacuum_override on its own')
+            self.pump.set_override(VACUUM_OVERRIDES[override])
+            self.get_logger().warn(f"Vacuum override: {override} (state={self.state}, running={self.running})")
+            return SetParametersResult(successful=True)
+        if not {'pull_pattern', 'pull_duration'} & changes.keys():
+            return SetParametersResult(successful=True)
+        if self.running or self.pull_active:
+            return SetParametersResult(successful=False, reason='cannot change the pull while a pick is running')
+        pattern = changes.get('pull_pattern', self.pull_pattern)
+        if pattern not in PULL_CONTROLLERS:
+            return SetParametersResult(successful=False, reason=f"unknown pull_pattern '{pattern}' (options: {list(PULL_CONTROLLERS)})")
+        self._set_pull(pattern, float(changes.get('pull_duration', self.get_parameter('pull_duration').value)))
+        self.get_logger().info(f"Pull pattern changed: {self.pull_pattern} for {self.pull_duration:.1f} s")
+        return SetParametersResult(successful=True)
+
+    def _sync_resolved_pull_duration(self):
+        # keep the metadata param in step with a pull changed at runtime (can't set it from inside _on_set_parameters)
+        if self.get_parameter('resolved_pull_duration').value != self.pull_duration:
+            self._syncing_resolved = True
+            try:
+                self.set_parameters([Parameter('resolved_pull_duration', value=self.pull_duration)])
+            finally:
+                self._syncing_resolved = False
+
     # --- PULL HAND-OFF ---
     # Service calls are fire-and-forget (call_async, no spinning) since these run inside
     # control_loop / service callbacks and blocking there would deadlock the executor.
     def _enter_release(self, now):
         self.state = 'release' # move on to the picking motion
-        if RF_CONTROLLER and self.rf_model_loaded:
-            for key in self._rf_hist:
-                self._rf_hist[key].clear()
+        if self.rf is not None:
+            self.rf.reset()
         self.release_start_time = now
         # the pull controller takes over commanding; clear our smoothing state so the one
         # zero command we publish on 'done'/'failed' is actually zero
-        self.prev_cmd_x = self.prev_cmd_y = self.prev_cmd_z = 0.0
+        self.prev_cmd[:] = 0.0
         ready = self.pull_start_cli.service_is_ready() and (
             self.pull_pattern != 'heuristic_controller' or self.pull_goal_cli.service_is_ready())
         if not ready:
@@ -371,22 +324,29 @@ class FlexToFListener(Node):
             self.pull_active = False
             self.pull_stop_cli.call_async(Empty.Request())
 
-    # --- SUBSCRIBERS & PUBLISHERS (unchanged) ---
+    # --- SUBSCRIBERS ---
     def flex_callback(self, msg):
-        vals = np.array(msg.data) / 4.0
-        self.latest_flex = vals.reshape((4, 1))
+        self.latest_flex = (np.array(msg.data) / 4.0).reshape((4, 1))
 
     def tof_callback(self, msg):
         self.latest_tof = msg.data
-        self.tof_history.append(self.latest_tof)
+        self.tof_history.append(msg.data)
         self.get_logger().debug(f"ToF history: {list(self.tof_history)}")
 
+    def pressure_callback(self, msg):
+        self.latest_pressure = msg.data  # suction pressure
+
+    def force_callback(self, msg):
+        f = msg.wrench.force
+        self.latest_force = (f.x**2 + f.y**2 + f.z**2)**0.5  # scalar magnitude
+
+    # --- HELPERS ---
     def get_tof_diff(self):
+        """Change in ToF (mean of last 5 minus mean of first 5 readings), or None with < 10 readings."""
         if len(self.tof_history) < 10:
             return None
-        first_avg = sum(list(self.tof_history)[:5]) / 5
-        last_avg = sum(list(self.tof_history)[-5:]) / 5
-        return last_avg - first_avg
+        hist = list(self.tof_history)
+        return sum(hist[-5:]) / 5 - sum(hist[:5]) / 5
 
     def _compute_wiggle(self, elapsed):
         """Returns (vx, vy, vz, wx, wy) for the current wiggle phase, cycling on a timer."""
@@ -398,110 +358,6 @@ class FlexToFListener(Node):
         wy = -vert * WIGGLE_TILT_SIGN * WIGGLE_TILT_MAGNITUDE  # paired with vertical, opposite sign
         wx = -lat * WIGGLE_TILT_SIGN * WIGGLE_TILT_MAGNITUDE   # paired with lateral, opposite sign
         return vx, vy, vz, wx, wy
-
-    def pressure_callback(self, msg):
-        self.latest_pressure = msg.data  # store suction pressure
-    
-    def force_callback(self, msg):
-        f = msg.wrench.force
-        # scalar magnitude
-        self.latest_force = (f.x**2 + f.y**2 + f.z**2)**0.5
-
-
-
-    def rf_sync_cb(self, flex_msg, pressure_msg, force_msg, tof_msg):
-        """
-        Called when flex, pressure, force, tof messages are approximately time-aligned.
-        Builds the same sliding-window flattened feature vector used at training time.
-        Stores the last valid built window in self._last_built_X for _rf_features() to return.
-        """
-        # 1) compute force magnitude and 21-sample filtered force (training used filter_force(...,21))
-        try:
-            f = force_msg.wrench.force
-            force_mag = float((f.x**2 + f.y**2 + f.z**2)**0.5)
-        except Exception as e:
-            self.get_logger().debug(f"rf_sync_cb: bad force_msg: {e}")
-            return
-
-        # maintain 21-sample buffer and compute simple mean as proxy for filter_force(...,21)
-        self._force_raw_buffer.append(force_mag)
-        filtered_force = float(np.mean(list(self._force_raw_buffer)))
-
-        # 2) flex norm (training used a single flex_norm per timestep)
-        try:
-            flex_arr = np.asarray(flex_msg.data, dtype=float) / 4.0
-            flex_norm = float(np.linalg.norm(flex_arr))
-        except Exception:
-            # fallback: try ravel
-            try:
-                flex_norm = float(np.linalg.norm(np.ravel(np.array(flex_msg.data, dtype=float))))
-            except Exception as e:
-                self.get_logger().debug(f"rf_sync_cb: cannot parse flex_msg: {e}")
-                return
-
-        # 3) pressure and tof scalars
-        try:
-            pressure = float(pressure_msg.data)
-        except Exception:
-            pressure = float(getattr(pressure_msg, "data", 0.0))
-
-        try:
-            tof = float(tof_msg.data)
-        except Exception:
-            tof = float(getattr(tof_msg, "data", 0.0))
-
-        # 4) append to sliding windows (order must match training bundle)
-        # ensure keys exist (defensive)
-        for k in self.rf_feature_order:
-            if k not in self._rf_hist:
-                self._rf_hist[k] = deque(maxlen=self.rf_window_size)
-
-        self._rf_hist["Flex"].append(flex_norm)
-        self._rf_hist["Pressure"].append(pressure)
-        self._rf_hist["Force"].append(filtered_force)
-        self._rf_hist["TOF"].append(tof)
-
-        # 5) if we have enough samples, build flattened window oldest->newest per sensor
-        W = int(self.rf_window_size)
-        if all(len(self._rf_hist[k]) >= W for k in self.rf_feature_order):
-            feat_list = []
-            for k in self.rf_feature_order:
-                hist = list(self._rf_hist[k])
-                # use most recent W samples in order oldest -> newest
-                feat_list.extend(hist[-W:])
-            X = np.array(feat_list, dtype=float).reshape(1, -1)
-
-            # optional scaler
-            if self.rf_scaler is not None and hasattr(self.rf_scaler, "transform"):
-                try:
-                    X = self.rf_scaler.transform(X)
-                except Exception as e:
-                    self.get_logger().warn(f"rf_sync_cb: scaler.transform failed: {e}")
-                    X = None
-
-            # sanity-check vs model
-            if X is not None and hasattr(self.rf_model, "n_features_in_"):
-                if X.shape[1] != self.rf_model.n_features_in_:
-                    self.get_logger().warn(
-                        f"rf_sync_cb: built {X.shape[1]} features but model expects {self.rf_model.n_features_in_}"
-                    )
-                    X = None
-
-            # store for control loop to consume
-            self._last_built_X = X
-        else:
-            # not enough history yet
-            self._last_built_X = None
-
-    def _rf_features(self):
-        """
-        Return the most recent aligned window built by rf_sync_cb (or None).
-        This preserves your control_loop usage: call _rf_features() and get (1, N) array or None.
-        """
-        if not getattr(self, "rf_model_loaded", False):
-            return None
-        return getattr(self, "_last_built_X", None)
-
 
 
     def control_loop(self):
@@ -520,7 +376,7 @@ class FlexToFListener(Node):
         now = self.get_clock().now().nanoseconds * 1e-9
         dt = now - self.prev_time
         self.prev_time = now
-        
+
         if self.latest_flex is None or self.latest_tof is None:
             return
 
@@ -541,59 +397,49 @@ class FlexToFListener(Node):
                 if FLEX_CONTROLLER and self.latest_tof > self.tof_servo_threshold and (ex > self.position_threshold or ey > self.position_threshold):
                         self.state = 'servo'
                 elif self.latest_tof <= self.tof_relative_motion_threshold:
-                    if TOF_CONTROLLER:
-                        self.controller = 'relative_controller'
-                    else:
-                        self.get_logger().info("TOF CONTROLLER IS NOT ENABLED, OPEN LOOP PICK")
+                    self.controller = 'relative_controller'
+                    if not TOF_CONTROLLER:
                         # --- TOF_CONTROLLER is False: Open-Loop Pick ---
-                        self.controller = 'relative_controller'
-                        self.get_logger().info("ToF Controller OFF: triggering open-loop pick")
-                        self.state = 'pick'
-                        self.pick_start_time = now
-                        self.latest_pressure = None
-                        self.prev_cmd_x = self.prev_cmd_y = self.prev_cmd_z = 0.00
-                        self.get_logger().info(f'Picking: turning on vacuum (tof = {self.latest_tof})')
-                        self.pump.vacuum_on()
+                        self.get_logger().info("TOF CONTROLLER IS NOT ENABLED, OPEN LOOP PICK")
+                        self._enter_pick(now)
+        # Close to the apple: only the current state is evaluated each tick (if/elif), so a
+        # transition takes effect next tick instead of being overridden by a later check.
         if self.controller == 'relative_controller':
+            off_center = ex > self.position_threshold or ey > self.position_threshold
             if self.state == 'servo':
-                # Switch to 'approach' if centered OR below servo threshold
-                if (ex < self.position_threshold and ey < self.position_threshold) or self.latest_tof <= self.tof_servo_threshold:
+                # Switch to 'approach' once centered (ToF isn't checked here: we're always close by now,
+                # and flex centering should keep working at close range)
+                if ex < self.position_threshold and ey < self.position_threshold:
                     self.state = 'approach'
-            if self.state == 'approach':
-                if ex > self.position_threshold or ey > self.position_threshold:
-                    if FLEX_CONTROLLER:
-                        self.state = 'servo'
-                    else:
+            elif self.state == 'approach':
+                if off_center and FLEX_CONTROLLER:
+                    self.state = 'servo'  # center first; ToF checks resume once back in approach
+                else:
+                    if off_center:
                         self.get_logger().debug("FLEX CONTROLLER IS NOT ENABLED STAY IN APPROACH STATE")
+                    tof_diff = self.get_tof_diff()
+                    if tof_diff is None:
+                        self.get_logger().debug("not enough ToF history yet")
+                    elif tof_diff < 0: # apple is getting closer
+                        self.get_logger().info("apple is getting closer", throttle_duration_sec=0.5)
+                    elif tof_diff > 1: # apple is being pushed away
+                        self.get_logger().info("apple is getting pushed away")
+                        self.state = 'reverse'
+                    else: # apple is nicely aligned
+                        self.get_logger().info("apple is nicely aligned")
+                        self._enter_pick(now)
+            elif self.state == 'reverse':
                 tof_diff = self.get_tof_diff()
-                if tof_diff < 0: # apple is getting closer
-                    self.get_logger().info("apple is getting closer")
-                elif tof_diff > 1: # apple is being pushed away
-                    self.get_logger().info("apple is getting pushed away")
-                    self.state = 'reverse'
-                else: # apple is nicely aligned
-                    self.get_logger().info("apple is nicely aligned")
-                    self.state = 'pick'
-                    self.pick_start_time = now
-                    self.latest_pressure = None
-                    self.prev_cmd_x = self.prev_cmd_y = self.prev_cmd_z = 0.00
-                    self.get_logger().info(f'Picking: turning on vacuum (tof = {self.latest_tof})')
-                    self.pump.vacuum_on()
-            if self.state == 'reverse':
-                tof_diff = self.get_tof_diff()
-                if tof_diff < 0: # apple is getting closer
+                if tof_diff is None:
+                    self.get_logger().debug("not enough ToF history yet")
+                elif tof_diff < 0: # apple is getting closer
                     self.get_logger().debug("apple is getting closer")
                 elif tof_diff > 1: # apple is being pushed away
                     self.get_logger().debug("apple is getting further away")
                     self.state = 'approach'
                 else: # apple is nicely aligned
                     self.get_logger().debug("apple is nicely aligned")
-                    self.state = 'pick'
-                    self.pick_start_time = now
-                    self.latest_pressure = None
-                    self.prev_cmd_x = self.prev_cmd_y = self.prev_cmd_z = 0.00
-                    self.get_logger().info(f'Picking: turning on vacuum (tof = {self.latest_tof})')
-                    self.pump.vacuum_on()
+                    self._enter_pick(now)
             elif self.state == 'pick':
                 elapsed = now - self.pick_start_time # start of grasp
                 pressure = self.latest_pressure if self.latest_pressure is not None else float('inf')
@@ -615,30 +461,20 @@ class FlexToFListener(Node):
                 elapsed_release = now - self.release_start_time
                 self.get_logger().debug(f"RELEASE elapsed={elapsed_release:.2f}")
 
-                if RF_CONTROLLER and self.rf_model_loaded:
-                    self.get_logger().info("RF CONTROLLER STUFF IS HAPPENING NOW")
-                    if now - self.last_rf_time > self.rf_period:
-                        self.last_rf_time = now
-
-                        features = self._rf_features()
-                        if features is not None:
-                            assert features.shape[1] == self.rf_model.n_features_in_
-
-                            label = int(self.rf_model.predict(features)[0])
-                            self.get_logger().info(f"RF predicted label={label}")
-
-                            if label == 1:
-                                self.get_logger().info("RF SUCCESS → done")
-                                self._stop_pull()
-                                self.state = "done"
-                                return
-
-                            elif label in (2, 3):
-                                self.get_logger().warn("RF FAILURE → abort")
-                                self._stop_pull()
-                                self.pump.vacuum_off()
-                                self.state = "failed"
-                                return
+                label = self.rf.predict(now) if self.rf is not None else None
+                if label is not None:
+                    self.get_logger().info(f"RF predicted label={label}")
+                    if label == 1:
+                        self.get_logger().info("RF SUCCESS → done")
+                        self._stop_pull()
+                        self.state = "done"
+                        return
+                    elif label in (2, 3):
+                        self.get_logger().warn("RF FAILURE → abort")
+                        self._stop_pull()
+                        self.pump.vacuum_off()
+                        self.state = "failed"
+                        return
 
                 # Pulling back (picking motion)
                 if elapsed_release < self.pull_duration:
@@ -650,61 +486,48 @@ class FlexToFListener(Node):
                     self._stop_pull()
                     self.state = 'done'
 
-        cmd_wz = 0.0   # default: no rotation
-        cmd_wx = cmd_wy = 0.0  # default: no tilt
+        cmd_w = [0.0, 0.0, 0.0]  # default: no rotation / tilt
         # --- Command selection ---
         if self.state == 'servo':
-            cmd_vx, cmd_vy, cmd_vz = vx, vy, 0.1
+            cmd_v = [vx, vy, 0.1]
         elif self.state == 'approach':
-            cmd_vx, cmd_vy = 0.0, 0.0
-            cmd_vz = 0.1 * self.velocity_scale_factor_z
+            cmd_v = [0.0, 0.0, 0.1 * self.velocity_scale_factor_z]
         elif self.state == 'reverse':
-            cmd_vx, cmd_vy = 0.0, 0.0
-            cmd_vz = -0.1 * self.velocity_scale_factor_z
+            cmd_v = [0.0, 0.0, -0.1 * self.velocity_scale_factor_z]
         elif self.state == 'release':
             # external pull controller owns /servo_node/delta_twist_cmds; don't fight it
             return
         elif self.state == 'pick' and WIGGLE_ENABLED:
-            elapsed_pick = now - self.pick_start_time
-            cmd_vx, cmd_vy, cmd_vz, cmd_wx, cmd_wy = self._compute_wiggle(elapsed_pick)
+            wvx, wvy, wvz, wwx, wwy = self._compute_wiggle(now - self.pick_start_time)
+            cmd_v = [wvx, wvy, wvz]
+            cmd_w = [wwx, wwy, 0.0]
         else: # pick state (wiggle disabled) or done state
-            cmd_vx = cmd_vy = cmd_vz = 0.0
+            cmd_v = [0.0, 0.0, 0.0]
 
-
-
-        # --- Acceleration limit + smoothing ---
-        dvx = np.clip(cmd_vx - self.prev_cmd_x, -self.acc_max * dt, self.acc_max * dt)
-        dvy = np.clip(cmd_vy - self.prev_cmd_y, -self.acc_max * dt, self.acc_max * dt)
-        dvz = np.clip(cmd_vz - self.prev_cmd_z, -self.acc_max * dt, self.acc_max * dt)
-
-        raw_x = self.prev_cmd_x + dvx
-        raw_y = self.prev_cmd_y + dvy
-        raw_z = self.prev_cmd_z + dvz
-
-        out_x = self.alpha_cmd * raw_x + (1 - self.alpha_cmd) * self.prev_cmd_x
-        out_y = self.alpha_cmd * raw_y + (1 - self.alpha_cmd) * self.prev_cmd_y
-        out_z = self.alpha_cmd * raw_z + (1 - self.alpha_cmd) * self.prev_cmd_z
-        self.prev_cmd_x, self.prev_cmd_y, self.prev_cmd_z = out_x, out_y, out_z
+        # --- Acceleration limit + smoothing (linear only) ---
+        dv = np.clip(np.array(cmd_v) - self.prev_cmd, -self.acc_max * dt, self.acc_max * dt)
+        self.prev_cmd = self.prev_cmd + self.alpha_cmd * dv  # == alpha*(prev+dv) + (1-alpha)*prev
 
         # Publish twist
         cmd = TwistStamped()
         cmd.header.stamp = self.get_clock().now().to_msg()
         cmd.header.frame_id = 'tool0'
-        cmd.twist.linear.x = out_x
-        cmd.twist.linear.y = out_y
-        cmd.twist.linear.z = out_z
-        cmd.twist.angular.x = cmd_wx
-        cmd.twist.angular.y = cmd_wy
-        cmd.twist.angular.z = cmd_wz
+        cmd.twist.linear.x, cmd.twist.linear.y, cmd.twist.linear.z = (float(v) for v in self.prev_cmd)
+        cmd.twist.angular.x, cmd.twist.angular.y, cmd.twist.angular.z = (float(w) for w in cmd_w)
         self.gripper_pub.publish(cmd)
-        # self.get_logger().info(f"PUBLISHING COMMAND!!!!: {cmd}")
 
         # Debug apple pos
         apple = Float32MultiArray(data=[float(self.x[1]), float(self.x[0])])
         self.apple_pub.publish(apple)
 
 
-    # The rest of your helper functions are unchanged; include them as-is:
+    # --- FILTERS & PID ---
+    def _reset_control_state(self):
+        self._init_kalman()
+        self._init_pid()
+        self.prev_cmd = np.zeros(3)  # smoothed linear command (x, y, z)
+        self.prev_time = self.get_clock().now().nanoseconds * 1e-9
+
     def _init_kalman(self):
         n, m = 2, 4
         self.x = np.zeros((n,1))
@@ -716,7 +539,6 @@ class FlexToFListener(Node):
 
     def _init_pid(self):
         self.current_x = self.current_y = 0.0
-        self.current_x_vel = self.current_y_vel = 0.0
         self.smoothed_x = self.smoothed_y = 0.0
         self.alpha_pos = 0.3
         self.alpha_cmd = 0.3
@@ -755,13 +577,12 @@ class FlexToFListener(Node):
         self.current_x += vx * dt
         self.current_y += vy * dt
         self.prev_err_x, self.prev_err_y = err_x, err_y
-        self.current_x_vel, self.current_y_vel = vx, vy
         return vx * self.velocity_scale_factor_xy, vy * self.velocity_scale_factor_xy
 
 
 def main():
     rclpy.init()
-    node = FlexToFListener()
+    node = RelativeMotionController()
     exe = MultiThreadedExecutor()
     exe.add_node(node)
     try:
