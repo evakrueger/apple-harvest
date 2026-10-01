@@ -1,7 +1,32 @@
 <?xml version="1.0"?>
+<!--
+  FULL ROBOT: Amiga platform + UR5e arm + gripper/ejector + two RealSense D435i cameras.
+
+  Tree:  world -> amiga__base -> amiga__body -> amiga__tool0 (arm mount)
+           -> UR5e (base_link ... wrist_3_link -> flange -> tool0)
+                tool0 -> gripper_link (tip), ejector_link, mast camera, tracking marker
+         amiga__base -> base camera
+
+  Pieces live in:
+    amiga.urdf.xacro    Amiga frame, its collision boxes, and where the arm mounts
+    gripper.urdf.xacro  gripper body, ejector, suction-cup / palm / top camera frames
+    _d435i.urdf.xacro   local copy of the RealSense macro with a "prefix" param added
+
+  The arm + gripper WITHOUT the Amiga is ur_gripper.urdf.xacro. It duplicates gripper_joint
+  below; keep the two in sync.
+
+  UNITS: meters and radians (inches x 0.0254 = m, degrees x pi/180 = rad).
+  tool0 axes: +z out of the flange along the gripper, -y toward the ejector/mast-camera side.
+
+  To build by hand (e.g. to check a change):
+    xacro amiga_ur_gripper.urdf.xacro name:=ur -o /tmp/robot.urdf && check_urdf /tmp/robot.urdf
+  (name:=ur is needed because <robot name> is read before the default below is declared.)
+  Restart robot_state_publisher / MoveIt / RViz to pick up changes; no rebuild needed
+  (install/ symlinks back to these files).
+-->
 <robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="$(arg name)">
 
-  <!-- keep the basics -->
+  <!-- UR driver args: these just pass through to ur_robot below. Launch files set most of them. -->
   <xacro:arg name="name" default="ur"/>
   <xacro:arg name="ur_type" default="ur5e"/>  <!-- absorbs CLI arg; we won't pass it to ur_robot -->
   <xacro:arg name="tf_prefix" default=""/>
@@ -33,13 +58,17 @@
   <xacro:arg name="sim_gazebo" default="false"/>
   <xacro:arg name="sim_ignition" default="false"/>
   <xacro:arg name="simulation_controllers" default=""/>
+  <!-- Joint angles the arm starts at in fake hardware / simulation -->
   <xacro:arg name="initial_positions_file" default="$(find robot_custom_hardware)/config/initial_positions.yaml"/>
   <xacro:property name="initial_positions_file" default="$(arg initial_positions_file)"/>
 
-  <!-- Amiga args -->
+  <!-- Amiga args: prefix for every Amiga link name (amiga__base, amiga__body, amiga__tool0) -->
   <xacro:arg name="amiga_prefix" default="amiga__"/>
 
-  <!-- Realsense args -->
+  <!-- Realsense args.
+       true:  the URDF includes each camera's internal frames (depth / color / infra optical)
+              at nominal factory offsets, e.g. mast_camera_color_optical_frame.
+       false: the realsense driver must publish those frames itself. -->
   <xacro:arg name="use_nominal_extrinsics" default="true" />
 
   <!-- Define the four args with the names the UR macro expects -->
@@ -62,7 +91,7 @@
   <xacro:property name="robot_custom_hardware" value="package://robot_custom_hardware/"/>
   <xacro:amiga_macro amiga_prefix="$(arg amiga_prefix)" amiga_parent="world" mesh_base_path="package://robot_custom_hardware/meshes/"/>
 
-  <!-- UR5e arm -->
+  <!-- UR5e arm, mounted on amiga__tool0 (mount pose is set in amiga.urdf.xacro) -->
   <xacro:ur_robot
       name="$(arg name)"
       tf_prefix="$(arg tf_prefix)"
@@ -104,32 +133,49 @@
     <origin xyz="0 0 0" rpy="0 0 0"/>
   </xacro:ur_robot>
 
-  <!-- mount gripper -->
+  <!-- Gripper mount: gripper_link = the gripper TIP, 25 cm straight out from the flange
+       (the gripper spans 1-25 cm). MoveIt drives this frame to pick targets, and
+       start_harvest.py trigger_move_arm_to_pose stops it 15 cm short (world -y) of the apple.
+       If you change this z:
+         - make the same change in ur_gripper.urdf.xacro
+         - shift the frames in gripper.urdf.xacro (they're relative to the tip)
+         - recompute the gripper box center in gripper.urdf.xacro -->
   <joint name="gripper_joint" type="fixed">
     <parent link="tool0"/>
     <child  link="gripper_link"/>
-    <origin xyz="0.00 0.00 0.215" rpy="0 0 0"/>
+    <origin xyz="0.00 0.00 0.25" rpy="0 0 0"/>
   </joint>
 
+  <!-- Gripper body, ejector plate, suction-cup / palm / top camera frames -->
   <xacro:gripper_macro/>
 
-  <!-- MAST Realsense for apple locations -->
-  <xacro:sensor_d435i 
+  <!-- MAST RealSense (on the wrist), used for apple locations; apple_prediction.py reads
+       mast_camera_color_optical_frame.
+       Origin = the camera's bottom screw hole, relative to tool0:
+         y = -0.09   9 cm over the wrist center (ejector side)
+         z = 0.055   5.5 cm out from the flange
+       rpy: the camera looks along +z (same direction as the gripper) with its top facing -y
+       (away from the wrist). If apple positions come out mirrored or flipped, check this rotation. -->
+  <xacro:sensor_d435i
     parent="tool0"
     prefix="mast_"
     use_nominal_extrinsics="$(arg use_nominal_extrinsics)">
-    <origin xyz="0.0 0.09 0.05" rpy="0 -1.57 -1.57"/>
+    <origin xyz="0.0 -0.09 0.055" rpy="0 -1.57 1.57"/>
   </xacro:sensor_d435i>
 
-  <!-- Realsense for trunk detections -->
-  <xacro:sensor_d435i 
-    parent="$(arg amiga_prefix)base" 
+  <!-- BASE RealSense (fixed on the Amiga), used for trunk detections.
+       Relative to amiga__base: 0.3937 m (15.5 in) along +y, 0.5556 m (21.875 in) up,
+       yawed 90 deg. -->
+  <xacro:sensor_d435i
+    parent="$(arg amiga_prefix)base"
     prefix="base_"
     use_nominal_extrinsics="$(arg use_nominal_extrinsics)">
     <origin xyz="0.0 0.3937 0.555625" rpy="0 0 1.57"/>
   </xacro:sensor_d435i>
 
-  <!-- Tracking marker frame -->
+  <!-- Tracking marker frame on the tool: 12 cm toward +y (the side opposite the ejector),
+       3.7 cm out from the flange. Frame only; the 1 mm red sphere just makes it visible in
+       RViz. No code references it by name. If the physical marker moved, update this. -->
   <joint name="tracking_marker_joint" type="fixed">
     <parent link="tool0"/>
     <child  link="tool0_tracking_marking_link"/>

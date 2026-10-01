@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import json
 import time
 from threading import Event, Lock
 
@@ -9,10 +10,11 @@ import torch
 import rclpy
 from rclpy.node import Node
 from rclpy.duration import Duration
-from rclpy.qos import qos_profile_sensor_data, QoSProfile, ReliabilityPolicy, HistoryPolicy
+from rclpy.qos import qos_profile_sensor_data, QoSProfile, ReliabilityPolicy, HistoryPolicy, DurabilityPolicy
 from rclpy.callback_groups import MutuallyExclusiveCallbackGroup
 
 from sensor_msgs.msg import Image, CameraInfo
+from std_msgs.msg import String
 from visualization_msgs.msg import Marker, MarkerArray
 from geometry_msgs.msg import PoseStamped, PoseArray
 from harvest_interfaces.srv import ApplePrediction
@@ -29,6 +31,40 @@ from .sphere_ransac import Sphere
 
 def stamp_to_ns(stamp) -> int:
     return int(stamp.sec) * 10**9 + int(stamp.nanosec)
+
+
+def bgr8_to_imgmsg(bgr):
+    """sensor_msgs/Image from a BGR uint8 array.
+
+    Not cv_bridge.cv2_to_imgmsg: that fails (KeyError 16) with pip's OpenCV 5, whose image type codes differ
+    from the OpenCV 4 cv_bridge was built against.
+    """
+    msg = Image()
+    msg.height, msg.width = bgr.shape[:2]
+    msg.encoding = "bgr8"
+    msg.is_bigendian = 0
+    msg.step = msg.width * 3
+    msg.data = np.ascontiguousarray(bgr, dtype=np.uint8).tobytes()
+    return msg
+
+
+def yolo_device(requested=""):
+    """requested if given, else the GPU when this PyTorch build supports it, else the CPU.
+
+    torch.cuda.is_available() isn't enough: a PyTorch built without this GPU's architecture (e.g. a GTX 1060,
+    sm_61, with a CUDA 13 build) still reports CUDA as available and then fails on the first inference. Code built
+    for an architecture runs on later ones of the same major version, so an sm_60 build is fine for sm_61.
+    """
+    if requested:
+        return requested
+    if torch.cuda.is_available():
+        major, minor = torch.cuda.get_device_capability(0)
+        for arch in torch.cuda.get_arch_list():
+            if arch.startswith("sm_") and arch[3:].isdigit():
+                arch_major, arch_minor = int(arch[3:-1]), int(arch[-1])
+                if arch_major == major and arch_minor <= minor:
+                    return "cuda:0"
+    return "cpu"
 
 
 class ApplePredictionFromTopics(Node):
@@ -48,7 +84,10 @@ class ApplePredictionFromTopics(Node):
         self.declare_parameter("prediction_distance_max", 1.0)
         self.declare_parameter("scan_data_path", "NOTGIVEN")
         self.declare_parameter("allow_reuse_latest_frame", False)
-        self.declare_parameter("x_tolerance", 0.9)
+        # drop detections with |x| > x_tolerance in target_frame; 0 = keep all. Off by default: it's measured from the
+        # Amiga's centerline, not the arm, and start_harvest's IK reach check now decides which apples are pickable
+        self.declare_parameter("x_tolerance", 0.0)
+        self.declare_parameter("yolo_device", "")  # "" = GPU if this PyTorch supports it, else CPU; or e.g. "cpu", "cuda:0"
         
         self.ns = self.get_parameter("camera_ns").value
         self.use_aligned = bool(self.get_parameter("use_aligned_depth").value)
@@ -78,12 +117,22 @@ class ApplePredictionFromTopics(Node):
                        depth=10)
         )
 
+        # Latest scan's detections as JSON, for the GUI to draw on the live camera view: {"stamp", "width", "height",
+        # "apples": [{"id", "bbox": [x1, y1, x2, y2] (color image pixels), "position": [x, y, z] (target_frame),
+        # "radius"}]}. ids are the index in the service response. Latched so a late subscriber gets the last scan.
+        self.detections_pub = self.create_publisher(
+            String, "apple_detections",
+            QoSProfile(reliability=ReliabilityPolicy.RELIABLE, history=HistoryPolicy.KEEP_LAST, depth=1,
+                       durability=DurabilityPolicy.TRANSIENT_LOCAL))
+
         # --- TF ---
         self.tf_buffer = Buffer()
         self.tf_listener = TransformListener(self.tf_buffer, self)
 
         # --- YOLO ---
         self.model = YOLO(self.get_parameter("prediction_model_path").value)
+        self.device = yolo_device(self.get_parameter("yolo_device").value)
+        self.get_logger().info(f"YOLO runs on {self.device}")
         try:
             self.model.model.eval()
         except Exception:
@@ -220,7 +269,7 @@ class ApplePredictionFromTopics(Node):
 
         # 1) YOLO
         with torch.inference_mode():
-            results = self.model(color_bgr, conf=self.conf_thr, verbose=False)[0]
+            results = self.model(color_bgr, conf=self.conf_thr, device=self.device, verbose=False)[0]
 
         # 2) Build instance-aligned masks & boxes
         masks, bboxes = self._build_instance_masks_and_boxes(results, Hc, Wc)
@@ -254,8 +303,9 @@ class ApplePredictionFromTopics(Node):
         # 5) Publish markers (filtered)
         self._publish_markers(poses_world_f, radii_f, frame_id=self.target_frame)
 
-        # 6) Publish annotated image (filtered bboxes)
+        # 6) Publish annotated image and detections (filtered)
         self._publish_annotated_image(color_bgr, bboxes_f, header=color_msg.header)
+        self._publish_detections(poses_world_f, radii_f, bboxes_f, color_msg.header.stamp, Wc, Hc)
 
         # 7) Fill response (filtered)
         res.apple_poses = poses_world_f
@@ -265,9 +315,11 @@ class ApplePredictionFromTopics(Node):
 
     def _filter_by_x_range(self, poses_world: PoseArray, radii, bboxes, x_abs_max: float):
         """
-        Keep only detections whose x (in target_frame) satisfies |x| <= x_abs_max.
+        Keep only detections whose x (in target_frame) satisfies |x| <= x_abs_max (all of them if x_abs_max <= 0).
         Returns: (filtered_pose_array, filtered_radii, filtered_bboxes, kept_indices)
         """
+        if x_abs_max <= 0:
+            return poses_world, list(radii), list(bboxes), list(range(len(poses_world.poses)))
         kept_indices = []
         out = PoseArray()
         out.header = poses_world.header  # preserve header if set
@@ -413,6 +465,19 @@ class ApplePredictionFromTopics(Node):
             arr.markers.append(m)
         self.marker_pub.publish(arr)
 
+    def _publish_detections(self, poses, radii, bboxes, stamp, width, height):
+        apples = []
+        for i, pose in enumerate(poses.poses):
+            p = pose.position
+            apples.append({
+                "id": i,
+                "bbox": [int(v) for v in bboxes[i]] if i < len(bboxes) else None,
+                "position": [round(float(p.x), 3), round(float(p.y), 3), round(float(p.z), 3)],
+                "radius": round(float(radii[i]), 3) if i < len(radii) else None,
+            })
+        self.detections_pub.publish(String(data=json.dumps({
+            "stamp": stamp.sec + stamp.nanosec * 1e-9, "width": int(width), "height": int(height), "apples": apples})))
+
     def _publish_annotated_image(self, bgr_img, bboxes, header=None):
         if bgr_img is None:
             return
@@ -459,7 +524,7 @@ class ApplePredictionFromTopics(Node):
                 (0, 0, 0), 2, cv2.LINE_AA
             )
 
-        msg = self.bridge.cv2_to_imgmsg(annotated, encoding="bgr8")
+        msg = bgr8_to_imgmsg(annotated)
         if header is not None:
             msg.header = header
         else:

@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  MoveIt semantic description (SRDF) for amiga_ur_gripper.urdf.xacro, the stock UR SRDF (planning group, home
+  state, arm collision pairs) plus our own parts.
+
+  Why. MoveIt checks every pair of links for collisions unless the SRDF says not to. Parts bolted together can
+  never collide, but they sit very close (the gripper body is 0.99 cm from the wrist, the Amiga rail 2.75 mm under
+  the UR base). MoveIt Servo slows down when any pair is closer than 1 cm (self_collision_proximity_threshold in
+  ur_moveit_config/config/ur_servo.yaml), so without these entries it braked through every pick
+  ("Close to a collision, decelerating").
+
+  Rule. Disable only pairs on the same rigid body, i.e. links joined by fixed joints only. Anything on different
+  sides of a moving joint stays checked. If you add a link with collision geometry to the URDF, add its pairs here.
+
+  Used by arm_control.launch.py (move_group and Servo, via ur_moveit.launch.py moveit_config_package / _file) and
+  arm_moveit_config.launch.py (move_arm).
+
+  NOTE ur_moveit.launch.py reads this file's output as YAML before using it as a string, so comments here must
+  not contain a colon followed by a space (it would parse as a YAML key and the launch fails).
+-->
+<robot xmlns:xacro="http://wiki.ros.org/xacro" name="$(arg name)">
+
+  <xacro:arg name="name" default="ur"/>
+  <xacro:arg name="prefix" default=""/>
+
+  <!-- the stock UR description -->
+  <xacro:include filename="$(find ur_moveit_config)/srdf/ur_macro.srdf.xacro"/>
+  <xacro:ur_srdf name="$(arg name)" prefix="$(arg prefix)"/>
+
+  <!-- Rigid body 1 - Amiga frame + UR base + base RealSense (amiga.urdf.xacro, amiga_ur_gripper.urdf.xacro) -->
+  <disable_collisions link1="amiga__body" link2="base_link_inertia" reason="Adjacent"/>
+  <disable_collisions link1="amiga__body" link2="base_camera_link" reason="Adjacent"/>
+  <disable_collisions link1="base_link_inertia" link2="base_camera_link" reason="Adjacent"/>
+
+  <!-- Rigid body 2 - wrist 3 + everything on the tool flange (gripper.urdf.xacro, mast RealSense) -->
+  <disable_collisions link1="wrist_3_link" link2="gripper_link" reason="Adjacent"/>
+  <disable_collisions link1="wrist_3_link" link2="ejector_link" reason="Adjacent"/>
+  <disable_collisions link1="wrist_3_link" link2="mast_camera_link" reason="Adjacent"/>
+  <disable_collisions link1="gripper_link" link2="ejector_link" reason="Adjacent"/>
+  <disable_collisions link1="gripper_link" link2="mast_camera_link" reason="Adjacent"/>
+  <disable_collisions link1="ejector_link" link2="mast_camera_link" reason="Adjacent"/>
+
+</robot>

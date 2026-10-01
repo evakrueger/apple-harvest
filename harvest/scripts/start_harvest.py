@@ -15,6 +15,10 @@ from controller_manager_msgs.srv import SwitchController
 from rclpy.action import ActionClient
 from action_msgs.msg import GoalStatus
 from harvest_interfaces.action import EventDetection
+from moveit_msgs.srv import GetPositionIK, GetPositionFK, GetStateValidity
+from moveit_msgs.msg import MoveItErrorCodes
+from builtin_interfaces.msg import Duration
+from geometry_msgs.msg import Quaternion
 
 # Python 
 import numpy as np
@@ -23,8 +27,65 @@ import os
 import yaml
 import copy
 import re
+import math
+import json
 from pathlib import Path
 from harvest import cameras
+from harvest import scan_pose
+from std_msgs.msg import Float32MultiArray, MultiArrayDimension
+from sensor_msgs.msg import JointState
+
+# Vision approach: the gripper tip (gripper_link) goes the standoff distance (approach_standoff parameter, default
+# APPROACH_STANDOFF) short of the apple, pointing at it level along
+# the horizontal line from the arm's base (ARM_BASE, its mount on the Amiga in amiga.urdf.xacro), turned at most
+# APPROACH_MAX_TURN from straight into the row (world +y) so it doesn't come in sideways along the row. The pick
+# controller then pushes the tip on along the gripper's axis, i.e. along the same line.
+APPROACH_STANDOFF = 0.15  # m, default of the approach_standoff parameter
+ARM_BASE = np.array([-0.095, 0.306, 1.048])  # world position of the UR5e base
+APPROACH_MAX_TURN = math.radians(45.0)
+# If an apple can't be picked from that aimed direction, other headings are tried, this far apart, nearest to the aimed
+# one first, within APPROACH_MAX_TURN of straight ahead (straight ahead included)
+APPROACH_TURN_STEP = math.radians(15.0)
+# MoveIt's KDL IK restarts from random seeds until its timeout: at 0.5 s it missed real solutions up to 5 times in 6,
+# at 2 s it found all of them. A point only counts as unreachable after IK_ATTEMPTS misses.
+IK_TIMEOUT = 2.0  # s
+IK_ATTEMPTS = 2
+# The pick controller servos the tip from the approach point to the apple. MoveIt Servo slows down when the arm's
+# Jacobian condition number passes 100 and stops at 200 (ur_servo.yaml lower_/hard_stop_singularity_threshold), e.g.
+# for apples far to the side, where pointing the gripper along +y lines up the wrist (wrist 2 near 180 deg).
+SERVO_SINGULARITY_LIMIT = 100.0
+SERVO_CHECK_POINTS = 4  # points checked from the approach point to the apple
+# The approach is a direct joint move from home (every joint straight to its target; move_arm_to_joints finds that
+# path whenever it's clear). It's checked for collisions every DIRECT_MOVE_STEP of joint motion: for apples far to the
+# side, the gripper can only point along the approach by folding back past the forearm.
+DIRECT_MOVE_STEP = math.radians(1.0)
+# No joint may turn more than this on the move from home to the approach point: bigger turns are the arm twirling
+# (a wrist spinning around), even when the joint move is otherwise direct
+APPROACH_MAX_JOINT_MOVE = math.radians(150.0)
+# UR5e joint limits (robot_custom_hardware/config/ur5e/joint_limits.yaml), for picking the equivalent joint angle
+# (+-360 deg) nearest home
+JOINT_LIMITS = {'shoulder_pan_joint': 2 * math.pi, 'shoulder_lift_joint': 2 * math.pi, 'elbow_joint': math.pi,
+                'wrist_1_joint': 2 * math.pi, 'wrist_2_joint': 2 * math.pi, 'wrist_3_joint': 2 * math.pi}
+# extra IK seeds around start, to find the other arm configurations at the approach point (fixed, so repeatable)
+IK_SEED_OFFSETS = [np.array(o) for o in ([0.5, 0, 0, 0, 0, 0], [-0.5, 0, 0, 0, 0, 0], [0, 0, 0, 0.8, 0, 0],
+                                         [0, 0, 0, -0.8, 0, 0], [0, 0, 0, 0, 0.8, 0], [0, 0, 0, 0, -0.8, 0])]
+
+
+def quaternion_from_rpy(roll, pitch, yaw):
+    cr, sr = math.cos(roll / 2), math.sin(roll / 2)
+    cp, sp = math.cos(pitch / 2), math.sin(pitch / 2)
+    cy, sy = math.cos(yaw / 2), math.sin(yaw / 2)
+    return Quaternion(x=sr * cp * cy - cr * sp * sy, y=cr * sp * cy + sr * cp * sy,
+                      z=cr * cp * sy - sr * sp * cy, w=cr * cp * cy + sr * sp * sy)
+
+
+def approach_orientation(heading):
+    # gripper pointing level along heading (rad, counterclockwise from world +x; straight into the row = pi/2), with
+    # the camera side up. At pi/2 this is RPY(pi/2, pi, pi), the fixed orientation of move_arm.cpp's pose services.
+    return quaternion_from_rpy(math.pi / 2, math.pi, heading + math.pi / 2)
+
+
+APPROACH_ORIENTATION = approach_orientation(math.pi / 2)  # straight into the row
 
 def get_data_storage_dir():
     # 1. Find this file’s folder:
@@ -46,6 +107,7 @@ def get_data_storage_dir():
     return data_dir
 
 class StartHarvest(Node):
+    approach_standoff = APPROACH_STANDOFF  # set from the parameter in __init__
     def __init__(self):
         super().__init__("start_harvest_node")
         self.cb_group = MutuallyExclusiveCallbackGroup()
@@ -68,6 +130,12 @@ class StartHarvest(Node):
         self.declare_parameter('enable_apple_prediction', False)
         self.declare_parameter('enable_picking', True)           
         self.declare_parameter('optimal_trajectory', False)
+        # 'manual': the arm is already at the apple (moved there in freedrive); 'vision': find apples with the
+        # RealSense (apple_prediction) and move to each one with MoveIt before picking
+        self.declare_parameter('approach', 'manual')
+        self.declare_parameter('max_apples', 0)            # vision: how many reachable apples to pre-select, nearest first (0 = all)
+        self.declare_parameter('approach_standoff', APPROACH_STANDOFF)  # vision: m short of the apple the approach stops
+        self.declare_parameter('move_to_scan_pose', True)  # vision: move to the scan pose (move_arm.cpp) before looking for apples
 
         # Retrieve parameter values
         self.PICK_PATTERN = self.get_parameter('pick_pattern').get_parameter_value().string_value
@@ -77,7 +145,15 @@ class StartHarvest(Node):
         self.enable_recording = self.get_parameter('enable_recording').get_parameter_value().bool_value
         self.enable_apple_prediction = self.get_parameter('enable_apple_prediction').get_parameter_value().bool_value
         self.enable_picking = self.get_parameter('enable_picking').get_parameter_value().bool_value 
-        self.use_optimal_trajectory = self.get_parameter('optimal_trajectory').get_parameter_value().bool_value 
+        self.use_optimal_trajectory = self.get_parameter('optimal_trajectory').get_parameter_value().bool_value
+        self.approach = self.get_parameter('approach').get_parameter_value().string_value
+        self.max_apples = self.get_parameter('max_apples').get_parameter_value().integer_value
+        self.move_to_scan_pose = self.get_parameter('move_to_scan_pose').get_parameter_value().bool_value
+        self.approach_standoff = self.get_parameter('approach_standoff').get_parameter_value().double_value
+        if self.approach not in ('manual', 'vision'):
+            raise ValueError(f"approach must be 'manual' or 'vision', not '{self.approach}'")
+        if self.approach == 'vision':
+            self.enable_apple_prediction = True  # the targets come from apple_prediction
 
         # Helper clients
         self.switch_controller_client = self.make_client(SwitchController, '/controller_manager/switch_controller')
@@ -86,17 +162,24 @@ class StartHarvest(Node):
         self.start_move_arm_to_home_client = self.make_client(Trigger, '/move_arm_to_home')
         self.coord_to_traj_client = self.make_client(CoordinateToTrajectory, 'coordinate_to_trajectory')
         self.trigger_arm_mover_client = self.make_client(SendTrajectory, 'send_arm_trajectory')
-        self.trigger_move_arm_to_pose_client =  self.make_client(MoveToPose, 'move_arm_to_pose')
         # self.get_gripper_pose_client = self.make_client(GetGripperPose, 'get_gripper_pose')
+
+        # Metadata, topic lists and file names: the stages use them whether or not they record
+        self.init_metadata_and_topics()
 
         # Conditional clients
         if self.enable_recording:
             self.start_record_client = self.make_client(RecordTopics, 'record_topics')
             self.stop_record_client = self.make_client(Trigger, 'stop_recording')
-            # Initialize metadata and topics
-            self.init_metadata_and_topics()
         if self.enable_apple_prediction:
             self.start_apple_prediction_client = self.make_client(ApplePrediction, '/apple_prediction')
+        if self.approach == 'vision':
+            self.compute_ik_client = self.make_client(GetPositionIK, '/compute_ik')  # move_group, for can_reach()
+            self.compute_fk_client = self.make_client(GetPositionFK, '/compute_fk')
+            self.state_validity_client = self.make_client(GetStateValidity, '/check_state_validity')
+            self.move_arm_to_scan_client = self.make_client(Trigger, '/move_arm_to_scan')  # built-in scan pose
+            self.move_arm_to_joints_client = self.make_client(SendTrajectory, '/move_arm_to_joints')  # saved one, approaches
+            self.move_arm_params_client = self.make_client(GetParameters, '/move_arm_node/get_parameters')  # home pose
         if self.enable_picking:
             # Local controllers (no namespace)
             self.start_controller_cli = self.make_client(Empty, '/start_controller')
@@ -119,6 +202,7 @@ class StartHarvest(Node):
             self.eva_controller_release_cli = self.make_client(Empty, '/relative_motion/release_apple')
             self.eva_controller_params_cli = self.make_client(GetParameters, '/relative_motion/get_parameters')
             self.last_pick_state = None  # set by pick_controller(); gates the release prompt
+            self.pick_settings = {}  # get_pick_settings() for the current pick, saved in its pick_metadata.yaml
 
             # Controller tuning / goal
             self.set_goal_cli = self.make_client(SetValue, '/set_goal')
@@ -150,8 +234,9 @@ class StartHarvest(Node):
             '/force_torque_sensor_broadcaster/wrench', '/vacuum_pressure',
         ] + cameras.recorded_image_topics(cameras.load_config())  # e.g. /usb_cam_image_raw, /realsense_image_raw (see harvest/config/cameras.yaml)
 
-        # Batch directories
-        self.batch_dir, self.batch_number = self.create_new_batch_directory(self.base_data_dir)
+        # Batch directory, only when recording (with enable_recording off nothing is written)
+        if self.enable_recording:
+            self.batch_dir, self.batch_number = self.create_new_batch_directory(self.base_data_dir)
 
         # File prefixes
         self.prediction_file_name_prefix = 'prediction'
@@ -334,26 +419,28 @@ class StartHarvest(Node):
         req.parameters = [Parameter(name='moveit_servo.robot_link_command_frame', value=new_param_value)]
         self.future = self.configure_servo_cli.call_async(req)
     
-    def start_apple_prediction(self):
-        # Starts servo node
+    def start_apple_prediction(self, timeout_sec=60.0):
+        # A scan takes a few seconds (longer on CPU); no answer in a minute means apple_prediction crashed or hung
         self.request = ApplePrediction.Request()
         self.future = self.start_apple_prediction_client.call_async(self.request)
-        rclpy.spin_until_future_complete(self, self.future) 
+        rclpy.spin_until_future_complete(self, self.future, timeout_sec=timeout_sec)
+        if not self.future.done() or self.future.result() is None:
+            raise RuntimeError(f'apple_prediction gave no answer within {timeout_sec:.0f} s. '
+                               'Check the Vision log: did the apple_prediction node crash?')
         return self.future.result().apple_poses
     
     def go_to_home(self):
-        # Starts go to home
-        self.request = Trigger.Request()
-        for attempt in range(1, 4):
-            self.future = self.start_move_arm_to_home_client.call_async(self.request)
-            rclpy.spin_until_future_complete(self, self.future, timeout_sec=15.0)
-            if self.future.done():
-                return self.future.result()
-            self.get_logger().warn(
-                f'go_to_home: no response after 15s (attempt {attempt}/3); '
-                'request may have been dropped before client/server discovery finished. Retrying...'
-            )
-        self.get_logger().error('go_to_home: giving up after 3 attempts with no response.')
+        # One request, waited for as long as the move takes: at low speed that's well over 15 s, and resending while
+        # the arm was still moving just queued more home moves. Waiting for the service first covers a request being
+        # dropped before discovery finished.
+        if not self.start_move_arm_to_home_client.wait_for_service(timeout_sec=10.0):
+            self.get_logger().error('go_to_home: /move_arm_to_home is not available.')
+            return None
+        self.future = self.start_move_arm_to_home_client.call_async(Trigger.Request())
+        rclpy.spin_until_future_complete(self, self.future, timeout_sec=300.0)
+        if self.future.done():
+            return self.future.result()
+        self.get_logger().error('go_to_home: no response after 300 s.')
         return None
     
     def call_coord_to_traj(self, apple_pose):
@@ -383,15 +470,6 @@ class StartHarvest(Node):
         rclpy.spin_until_future_complete(self, future) 
         return future.result()
     
-    def trigger_move_arm_to_pose(self, apple_pose):
-        request = MoveToPose.Request()
-        request.orientation = apple_pose.orientation
-        request.position = apple_pose.position
-        request.position.y = request.position.y - 0.3
-
-        future = self.trigger_move_arm_to_pose_client.call_async(request)
-        rclpy.spin_until_future_complete(self, future) 
-        return future.result()
     
     def event_detection(self):
         # Start event detection
@@ -456,6 +534,9 @@ class StartHarvest(Node):
             self.last_pick_state = None
             self.future = self.eva_controller_start_cli.call_async(req)
             rclpy.spin_until_future_complete(self, self.future)
+            if self.enable_recording:
+                # again now the controller has resolved this pick's pull duration (it does that as it starts)
+                self.pick_settings = self.get_pick_settings()
 
             elapsed = 0.0
             while elapsed < max_wait:
@@ -512,9 +593,14 @@ class StartHarvest(Node):
         settings['pull_duration'] = settings.pop('resolved_pull_duration')
         return settings
 
-    def save_apple_metadata(self, apple_dir):
-        # Per-apple settings + outcome, next to that apple's bag
-        data = {'pick_controller': self.PICK_PATTERN, **self.get_pick_settings()}
+    def save_apple_metadata(self, apple_dir, apple_position=None, status='complete'):
+        # Per-apple settings + outcome, next to that apple's bag. No ROS calls here: it also runs after an Abort or
+        # Ctrl+C, when rclpy has already shut down. status: 'in progress' (written as the pick starts, so it is what's
+        # left if start_harvest is killed), 'interrupted' (aborted, or an error, during the pick, home or release) or
+        # 'complete' (pick, home and release all ran; pick_result says whether the pick itself worked)
+        data = {'pick_controller': self.PICK_PATTERN, **self.pick_settings, 'status': status}
+        if apple_position is not None:
+            data['apple_position'] = [float(apple_position.x), float(apple_position.y), float(apple_position.z)]
         if self.PICK_PATTERN == 'eva-relative-motion':
             data['pick_result'] = self.last_pick_state
         os.makedirs(apple_dir, exist_ok=True)
@@ -560,24 +646,432 @@ class StartHarvest(Node):
         if self.enable_recording:
             self.stop_recording()
     
-    # Checks if a pose is within the UR5 workspace.
-    def is_within_reach(self, pose, min_reach=0.2, max_reach=0.95):      
-        # UR5e specs: max radius is 0.85m. min is 0.076
+    def distance_from_arm_base(self, pose):
         p = pose.position
-        
-        # Subtract the UR5e base offset from the apple's position
-        dx = p.x - (-0.095)
-        dy = p.y - 0.306
-        dz = p.z - 1.048
-        
-        # Calculate Euclidean distance from the ACTUAL arm base
-        distance = np.sqrt(dx**2 + dy**2 + dz**2)
-        print(f"DISTANCE: {distance}")
-        
-        return min_reach <= distance <= max_reach
+        return float(np.linalg.norm(np.array([p.x, p.y, p.z]) - ARM_BASE))
 
+    @staticmethod
+    def approach_heading(apple_pose):
+        # Horizontal direction the gripper approaches this apple in (rad, counterclockwise from world +x): from the
+        # arm's base toward the apple, within APPROACH_MAX_TURN of straight into the row (pi/2)
+        p = apple_pose.position
+        heading = math.atan2(p.y - ARM_BASE[1], p.x - ARM_BASE[0])
+        return min(max(heading, math.pi / 2 - APPROACH_MAX_TURN), math.pi / 2 + APPROACH_MAX_TURN)
 
-    def start(self): 
+    @staticmethod
+    def candidate_headings(apple_pose):
+        # Headings to try for this apple: the aimed one (approach_heading), then every APPROACH_TURN_STEP within
+        # APPROACH_MAX_TURN of straight ahead, nearest to the aimed one first
+        aimed = StartHarvest.approach_heading(apple_pose)
+        steps = int(round(APPROACH_MAX_TURN / APPROACH_TURN_STEP))
+        others = [math.pi / 2 + k * APPROACH_TURN_STEP for k in range(-steps, steps + 1)]
+        others = [h for h in others if abs(h - aimed) > math.radians(1.0)]
+        return [aimed] + sorted(others, key=lambda h: abs(h - aimed))
+
+    def approach_position(self, apple_pose, heading=None):
+        # Where the gripper tip goes for this apple: approach_standoff short of it, back along the approach heading
+        # (the aimed one unless given)
+        heading = self.approach_heading(apple_pose) if heading is None else heading
+        p = apple_pose.position
+        standoff = self.approach_standoff
+        return Point(x=p.x - standoff * math.cos(heading), y=p.y - standoff * math.sin(heading), z=p.z)
+
+    @staticmethod
+    def approach_turn_text(heading):
+        # e.g. '30 deg left of straight ahead' for a heading, for the log and prompts
+        turn = math.degrees(heading - math.pi / 2)
+        return 'straight ahead' if abs(turn) < 0.5 else f'{abs(turn):.0f} deg {"left" if turn > 0 else "right"} of straight ahead'
+
+    def can_reach(self, apple_pose, start=None):
+        # Whether the arm can do the whole pick of this apple: get to the approach point (approach_standoff short of
+        # it) with a direct joint move from start, then let Servo push the tip straight on to the apple. Checked with
+        # MoveIt, for the gripper TIP pointing along the approach: an arm configuration at the approach point and at
+        # SERVO_CHECK_POINTS points on to the apple, all within joint limits, without collisions, and not so close to
+        # a singularity that Servo would slow or stop; given start (a JointState, the pose the approach starts from:
+        # home), also the direct joint move from it, checked for collisions along the way. Unlike a distance-from-the-
+        # base limit, this accounts for the gripper's length, the wrist geometry, the approach direction and the Amiga.
+        # The aimed heading is tried first, then the other candidate_headings; the search order is fixed, so the same
+        # inputs give the same answer at the scan and at the approach.
+        # Returns (reachable, reason, arm JointState at the approach point (which the approach then moves to), heading).
+        aimed_reason = None
+        for heading in self.candidate_headings(apple_pose):
+            ok, reason, joints = self.can_reach_from(apple_pose, heading, start)
+            if ok:
+                if aimed_reason is not None:
+                    reason = (f'reachable approaching {self.approach_turn_text(heading)} '
+                              f'(aimed at {self.approach_turn_text(self.approach_heading(apple_pose))}: {aimed_reason})')
+                return True, reason, joints, heading
+            if aimed_reason is None:
+                aimed_reason = reason
+        return False, f'not reachable from any approach angle (aimed: {aimed_reason})', None, None
+
+    def can_reach_from(self, apple_pose, heading, start):
+        # can_reach for one approach heading. Returns (reachable, reason, arm JointState at the approach point).
+        approach, apple = self.approach_position(apple_pose, heading), apple_pose.position
+        orientation = approach_orientation(heading)
+        configurations, error = self.approach_configurations(approach, start, orientation)
+        if not configurations:
+            return False, error, None
+        # the IK has several solutions (elbow / wrist flips): use the one closest to start that passes everything
+        reason = None
+        for joints in configurations:
+            ok, reason = self.check_pick_from(joints, approach, apple, start, orientation)
+            if ok:
+                return True, 'reachable', joints
+        return False, reason, None
+
+    def approach_configurations(self, approach, start, orientation=APPROACH_ORIENTATION):
+        # Distinct arm configurations with the tip at the approach point, closest to start first. The IK is seeded
+        # from start and from fixed offsets around it (not random ones), so the same inputs give the same answer at
+        # the scan and at the approach. Returns (configurations, error if there are none).
+        first, error = self.solve_ik(approach, start, orientation)
+        if first is None:
+            return [], error.format(label='approach point')
+        found = [self.nearest_equivalent(first, start)]
+        if start is not None:
+            base = np.array(start.position)
+            for offset in IK_SEED_OFFSETS:
+                joints, _ = self.solve_ik(approach, JointState(name=list(start.name), position=(base + offset).tolist()),
+                                          orientation)
+                joints = self.nearest_equivalent(joints, start)
+                if joints is not None and all(np.abs(np.array(joints.position) - np.array(f.position)).max() > 1e-3
+                                              for f in found):
+                    found.append(joints)
+            found.sort(key=lambda j: np.abs(np.array(j.position) - base).sum())
+        return found, None
+
+    @staticmethod
+    def nearest_equivalent(joints, reference):
+        # The same arm configuration with each joint's angle moved by +-360 deg (within its limits) to the one nearest
+        # reference: IK can return a wrist at +200 deg when -160 deg is the same pose and a much shorter move.
+        if joints is None or reference is None:
+            return joints
+        ref = dict(zip(reference.name, reference.position))
+        positions = []
+        for name, q in zip(joints.name, joints.position):
+            if name in ref and name in JOINT_LIMITS:
+                options = [q + k * 2 * math.pi for k in (-1, 0, 1) if abs(q + k * 2 * math.pi) <= JOINT_LIMITS[name]]
+                q = min(options, key=lambda v: abs(v - ref[name])) if options else q
+            positions.append(q)
+        return JointState(name=list(joints.name), position=positions)
+
+    def check_pick_from(self, approach_joints, approach, apple, start, orientation=APPROACH_ORIENTATION):
+        # The rest of can_reach for one arm configuration at the approach point. Returns (ok, reason).
+        seed = approach_joints  # each next point's IK starts from the previous one's: same arm configuration
+        for k in range(SERVO_CHECK_POINTS):
+            f = k / (SERVO_CHECK_POINTS - 1)
+            label = ('approach point' if k == 0 else 'apple' if k == SERVO_CHECK_POINTS - 1
+                     else f'point {f * self.approach_standoff * 100:.0f} cm past the approach point')
+            if k == 0:
+                joints = approach_joints
+            else:
+                position = Point(x=approach.x + f * (apple.x - approach.x), y=approach.y + f * (apple.y - approach.y),
+                                 z=approach.z + f * (apple.z - approach.z))
+                joints, error = self.solve_ik(position, seed, orientation)
+                if joints is None:
+                    return False, error.format(label=label)
+            condition = self.condition_number(joints)
+            if condition is None:
+                return False, 'no answer from /compute_fk'
+            if condition > SERVO_SINGULARITY_LIMIT:
+                return False, (f'the arm would be near a singularity at the {label} (condition number {condition:.0f}, '
+                               f'Servo slows above {SERVO_SINGULARITY_LIMIT:.0f}); apples more in front of the arm work')
+            if k == 0 and start is not None:
+                ref = dict(zip(start.name, start.position))
+                moves = {name: abs(q - ref[name]) for name, q in zip(joints.name, joints.position) if name in ref}
+                name = max(moves, key=moves.get)
+                if moves[name] > APPROACH_MAX_JOINT_MOVE:
+                    return False, (f'the move from home would turn {name.replace("_joint", "")} by '
+                                   f'{math.degrees(moves[name]):.0f} deg (over {math.degrees(APPROACH_MAX_JOINT_MOVE):.0f}: '
+                                   'the arm would twirl around)')
+                clear, reason = self.direct_move_clear(start, joints)
+                if not clear:
+                    return False, reason
+            seed = joints
+        return True, 'reachable'
+
+    def home_joint_state(self):
+        # move_arm's home pose (its home_joint_positions parameter), where the approaches start; None if unavailable
+        request = GetParameters.Request()
+        request.names = ['home_joint_positions']
+        future = self.move_arm_params_client.call_async(request)
+        rclpy.spin_until_future_complete(self, future, timeout_sec=5.0)
+        result = future.result() if future.done() else None
+        if result is None or not result.values or len(result.values[0].double_array_value) != len(scan_pose.JOINT_NAMES):
+            return None
+        return JointState(name=list(scan_pose.JOINT_NAMES), position=list(result.values[0].double_array_value))
+
+    def move_to_joints(self, positions):
+        # direct joint move (move_arm_to_joints refuses rather than swinging around); positions in JOINT_NAMES order
+        request = SendTrajectory.Request()
+        request.waypoints = Float32MultiArray(data=[float(v) for v in positions])
+        request.waypoints.layout.dim = [MultiArrayDimension(label='waypoints', size=1, stride=len(positions)),
+                                        MultiArrayDimension(label='joints', size=len(positions), stride=1)]
+        future = self.move_arm_to_joints_client.call_async(request)
+        rclpy.spin_until_future_complete(self, future)
+        result = future.result()
+        return result is not None and result.success
+
+    def direct_move_clear(self, start, goal):
+        # Whether moving every joint straight from start to goal (JointStates) stays collision-free, checked every
+        # DIRECT_MOVE_STEP of joint motion with move_group's /check_state_validity. Returns (clear, reason).
+        names = list(scan_pose.JOINT_NAMES)
+        a, b = dict(zip(start.name, start.position)), dict(zip(goal.name, goal.position))
+        qa, qb = np.array([a[name] for name in names]), np.array([b[name] for name in names])
+        steps = max(1, int(np.ceil(np.abs(qb - qa).max() / DIRECT_MOVE_STEP)))
+        for i in range(steps + 1):
+            request = GetStateValidity.Request()
+            request.group_name = 'ur_manipulator'
+            request.robot_state.joint_state = JointState(name=names, position=(qa + (qb - qa) * i / steps).tolist())
+            future = self.state_validity_client.call_async(request)
+            rclpy.spin_until_future_complete(self, future, timeout_sec=5.0)
+            result = future.result() if future.done() else None
+            if result is None:
+                return False, 'no answer from /check_state_validity'
+            if not result.valid:
+                pairs = sorted({' and '.join(sorted((c.contact_body_1, c.contact_body_2))) for c in result.contacts})
+                return False, (f'the direct move from home would hit something {100 * i / steps:.0f}% of the way '
+                               f'({"; ".join(pairs) if pairs else "collision"})')
+        return True, 'clear'
+
+    def solve_ik(self, position, seed=None, orientation=APPROACH_ORIENTATION):
+        # Joint state putting the gripper tip at position with the given orientation, or (None, reason with a
+        # {label} placeholder). Starts from seed (a JointState), else the current state.
+        request = GetPositionIK.Request()
+        ik = request.ik_request
+        ik.group_name = 'ur_manipulator'
+        ik.ik_link_name = 'gripper_link'
+        ik.robot_state.is_diff = True  # start from the current state (an empty non-diff state is an error)
+        if seed is not None:
+            ik.robot_state.joint_state = seed
+        ik.avoid_collisions = True
+        ik.pose_stamped.header.frame_id = 'world'
+        ik.pose_stamped.pose.position = position
+        ik.pose_stamped.pose.orientation = orientation
+        ik.timeout = Duration(sec=int(IK_TIMEOUT), nanosec=int(IK_TIMEOUT % 1 * 1e9))
+        for _ in range(IK_ATTEMPTS):
+            future = self.compute_ik_client.call_async(request)
+            rclpy.spin_until_future_complete(self, future, timeout_sec=IK_TIMEOUT + 5.0)
+            result = future.result() if future.done() else None
+            if result is None or result.error_code.val != MoveItErrorCodes.NO_IK_SOLUTION:
+                break
+        if result is None:
+            return None, 'no answer from /compute_ik'
+        if result.error_code.val == MoveItErrorCodes.NO_IK_SOLUTION:
+            return None, 'the gripper tip can\'t reach the {label} (too far, too close, or only in collision)'
+        if result.error_code.val != MoveItErrorCodes.SUCCESS:
+            return None, f'IK error code {result.error_code.val} for the {{label}}'
+        return result.solution.joint_state, None
+
+    def tool0_pose(self, joint_state):
+        # (position, rotation matrix) of tool0 at these joints, from move_group's /compute_fk. In world, the planning
+        # frame, so no TF lookup is needed; the condition number is the same in any fixed frame.
+        request = GetPositionFK.Request()
+        request.header.frame_id = 'world'
+        request.fk_link_names = ['tool0']
+        request.robot_state.joint_state = joint_state
+        future = self.compute_fk_client.call_async(request)
+        rclpy.spin_until_future_complete(self, future, timeout_sec=5.0)
+        result = future.result() if future.done() else None
+        if result is None or result.error_code.val != MoveItErrorCodes.SUCCESS or not result.pose_stamped:
+            return None
+        p, q = result.pose_stamped[0].pose.position, result.pose_stamped[0].pose.orientation
+        x, y, z, w = q.x, q.y, q.z, q.w
+        rotation = np.array([[1 - 2 * (y * y + z * z), 2 * (x * y - z * w), 2 * (x * z + y * w)],
+                             [2 * (x * y + z * w), 1 - 2 * (x * x + z * z), 2 * (y * z - x * w)],
+                             [2 * (x * z - y * w), 2 * (y * z + x * w), 1 - 2 * (x * x + y * y)]])
+        return np.array([p.x, p.y, p.z]), rotation
+
+    def condition_number(self, joint_state, eps=1e-4):
+        # Condition number of the arm's 6x6 Jacobian at tool0, as MoveIt Servo computes it, by finite differences
+        base = self.tool0_pose(joint_state)
+        if base is None:
+            return None
+        jacobian = np.zeros((6, len(joint_state.name)))
+        for i in range(len(joint_state.name)):
+            moved = copy.deepcopy(joint_state)
+            moved.position = list(joint_state.position)
+            moved.position[i] += eps
+            pose = self.tool0_pose(moved)
+            if pose is None:
+                return None
+            jacobian[:3, i] = (pose[0] - base[0]) / eps
+            dr = pose[1] @ base[1].T  # small rotation -> rotation vector
+            jacobian[3:, i] = np.array([dr[2, 1] - dr[1, 2], dr[0, 2] - dr[2, 0], dr[1, 0] - dr[0, 1]]) / (2 * eps)
+        singular_values = np.linalg.svd(jacobian, compute_uv=False)
+        return float(singular_values[0] / max(singular_values[-1], 1e-12))
+
+    def pick_and_release(self, apple_dir, apple_position=None):
+        # Stage 4: pick controller
+        input('Hit continue to start pressure servoing and pick controller')
+        self.last_pick_state = None  # not the previous apple's, if this pick stops before the controller reports
+        if self.enable_recording:
+            # saved before the bag starts, and again at the end or on an Abort, so the bag always has its metadata
+            self.pick_settings = self.get_pick_settings()
+            self.save_apple_metadata(apple_dir, apple_position, status='in progress')
+
+        def pick_action():
+            if self.enable_picking:
+                self.pick_controller()
+            self.configure_servo('tool0')
+
+        try:
+            self.run_stage(
+                self.relative_motion_controller_topics, # I edited these to match my topics
+                apple_dir + self.final_approach_and_pick_file_name_prefix,
+                servo_frame='base_link',
+                use_servo=True,
+                action_fn=pick_action
+            )
+
+            # Stage 5: home & release & save
+            self.go_to_home()
+
+            if self.PICK_PATTERN == 'eva-relative-motion':
+                if self.last_pick_state == 'done':
+                    input('Press continue to release apple')
+                    self.future = self.eva_controller_release_cli.call_async(Empty.Request())
+                    rclpy.spin_until_future_complete(self, self.future)
+                else:
+                    self.get_logger().warn(
+                        f"Skipping release prompt: pick did not complete successfully (last state: {self.last_pick_state})"
+                    )
+        except BaseException:  # the GUI's Abort / Ctrl+C (KeyboardInterrupt), or an error
+            if self.enable_recording:
+                self.save_apple_metadata(apple_dir, apple_position, status='interrupted')
+            raise
+
+        if self.enable_recording:
+            self.save_apple_metadata(apple_dir, apple_position)
+
+    def parse_apple_selection(self, answer, default, candidates):
+        # blank = the default selection, 'none' = nothing, else the numbers in the answer. Unreachable or unknown
+        # numbers are dropped; the rest are picked nearest first.
+        answer = answer.strip().lower()
+        if not answer:
+            ids = default
+        elif answer == 'none':
+            ids = []
+        else:
+            ids = [int(n) for n in re.findall(r'\d+', answer)]
+        by_id = {c['id']: c for c in candidates}
+        for i in ids:
+            if i not in by_id:
+                self.get_logger().warn(f'There is no apple {i}; ignoring it')
+            elif not by_id[i]['reachable']:
+                self.get_logger().warn(f'Apple {i} is not reachable ({by_id[i]["reason"]}); ignoring it')
+        ids = [i for i in dict.fromkeys(ids) if i in by_id and by_id[i]['reachable']]
+        return sorted(ids, key=lambda i: by_id[i]['distance'])
+
+    def start_vision_approach(self):
+        # Scan with the RealSense, then for each reachable apple (nearest first): move the gripper tip to 15 cm
+        # in front of it with MoveIt, and run the same pick / home / release as the manual approach.
+        # Stage 1: the scan pose, so the wrist camera looks at the canopy from a known pose
+        if self.move_to_scan_pose:
+            saved = scan_pose.load()  # set in the GUI's Preferences tab
+            if saved:
+                self.get_logger().info(f'Moving arm to the saved scan pose (saved {saved["saved"]}) to look for apples')
+                moved = self.move_to_joints(saved['positions'])
+            else:
+                self.get_logger().info('Moving arm to the built-in scan pose (move_arm.cpp) to look for apples')
+                future = self.move_arm_to_scan_client.call_async(Trigger.Request())
+                rclpy.spin_until_future_complete(self, future)
+                moved = future.result() is not None and future.result().success
+            if not moved:
+                # scanning from an unknown pose would put the detections somewhere unexpected: stop instead
+                raise RuntimeError('Could not move to the scan pose (see the Robot log for why); stopping.')
+        # apple_prediction transforms with the latest TF, not the image's: let the arm and camera settle first
+        time.sleep(1.0)
+
+        # Stage 2: apple locations (world frame)
+        self.get_logger().info('Predicting apple locations')
+        if self.enable_recording:
+            self.start_recording(self.prediction_topics, self.batch_dir + self.prediction_file_name_prefix)
+            time.sleep(self.recording_startup_delay)
+        try:
+            apple_poses = self.start_apple_prediction()
+        finally:
+            if self.enable_recording:
+                self.stop_recording()
+        self.apple_coordinates = {f'apple_{i+1}': [p.position.x,p.position.y,p.position.z]
+                                    for i,p in enumerate(apple_poses.poses)}
+
+        # Apple numbers are their index in the scan, the same numbers apple_prediction draws on the image.
+        # Reach is checked from home, where the approaches start (the arm is still at the scan pose).
+        home = self.home_joint_state()
+        if home is None:
+            # without it the checks can't follow the real move from home (and older move_arm builds don't have it)
+            raise RuntimeError('Could not read the home pose from move_arm (its home_joint_positions parameter). '
+                               'Restart the robot stack so the current move_arm is running; stopping.')
+        candidates = []
+        for i, p in enumerate(apple_poses.poses):
+            ok, reason, _, heading = self.can_reach(p, start=home)
+            distance = self.distance_from_arm_base(p)
+            approach = self.approach_turn_text(heading if ok else self.approach_heading(p))
+            self.get_logger().info(f'  apple {i} at ({p.position.x:.3f}, {p.position.y:.3f}, {p.position.z:.3f}), '
+                                   f'{distance:.2f} m from the arm base, approach {approach}: {reason}')
+            candidates.append({'id': i, 'position': [round(p.position.x, 3), round(p.position.y, 3), round(p.position.z, 3)],
+                               'distance': round(distance, 3), 'reachable': ok, 'reason': reason})
+        reachable = sorted((c for c in candidates if c['reachable']), key=lambda c: c['distance'])
+        self.get_logger().info(f'Found {len(candidates)} apples, {len(reachable)} within reach')
+        # one line the GUI turns into its apple list
+        print('APPLE_CANDIDATES ' + json.dumps(candidates), flush=True)
+
+        selected = []
+        if reachable:
+            default = [c['id'] for c in (reachable[:self.max_apples] if self.max_apples > 0 else reachable)]
+            answer = input(f'Select apples to pick (numbers, or none) [{" ".join(map(str, default))}]: ')
+            selected = self.parse_apple_selection(answer, default, candidates)
+        self.get_logger().info(f'Picking apples {selected}' if selected else 'No apples selected')
+
+        # Back home once the apples are chosen (the arm stays at the scan pose while you choose): the approaches
+        # start from there
+        self.get_logger().info('Moving arm home')
+        result = self.go_to_home()
+        if result is None or not result.success:
+            raise RuntimeError('Could not move home after the scan (see the Robot log for why); stopping.')
+
+        for idx in selected:
+            apple = apple_poses.poses[idx]
+            base_dir = self.batch_dir + f'apple_{idx}/'
+            p = apple.position
+
+            # Stage 3: approach apple: a direct joint move to the arm configuration with the gripper tip at the approach
+            # point (approach_standoff short), pointing along the approach; the pick controller servos the rest of the
+            # way. (One straight line all the way from home could fail partway: IK jumps over the long move while the
+            # wrist turns.)
+            # same check as at the scan (the arm is home now); the move uses the configuration and heading it found
+            ok, reason, joints, heading = self.can_reach(apple, start=home)
+            if not ok and not self.use_optimal_trajectory:
+                self.get_logger().error(f'Apple {idx} is not reachable from here ({reason}); skipping it')
+                continue
+            turn = self.approach_turn_text(heading) if ok else 'straight ahead'
+            input(f'Hit continue to move to apple {idx} at ({p.x:.3f}, {p.y:.3f}, {p.z:.3f}), approaching '
+                  f'{turn}, stopping {self.approach_standoff * 100:.0f} cm short')
+            self.get_logger().info(f'Approaching apple {idx} ({turn})')
+            if self.use_optimal_trajectory:
+                waypoints = self.call_coord_to_traj(apple)
+                self.trigger_arm_mover(waypoints)
+            else:
+                by_name = dict(zip(joints.name, joints.position))
+                if not self.move_to_joints([by_name[name] for name in scan_pose.JOINT_NAMES]):
+                    self.get_logger().error(f'No direct move to apple {idx} (see the Robot log for why); skipping it')
+                    continue
+
+            if self.enable_picking:
+                self.pick_and_release(base_dir, p)
+
+        if self.enable_recording:
+            self.save_metadata()
+        self.get_logger().info('Batch Complete')
+
+    def start(self):
+        if self.approach == 'vision':
+            self.start_vision_approach()
+            return
+
+        # Manual approach: the arm was moved to the apple by hand (freedrive) before starting
+
         # Stage 1: Reset arm to home position
         # self.get_logger().info(f'Resetting arm to home position')
         # self.go_to_home()
@@ -604,73 +1098,11 @@ class StartHarvest(Node):
             base_dir = self.batch_dir + f'apple_{idx}/'
 
 
-        # # Stage 2: Request apple location prediction
-        # if self.enable_apple_prediction:
-        #     self.get_logger().info('Predicting apple locations')
-        #     apple_poses = self.start_apple_prediction()
-        # else:
-        #     self.get_logger().info('Skipping apple prediction, using pre-saved locations')
-        #     apple_poses = PoseArray()
-        #     apple_poses.poses = [
-        #         Pose(position=Point(x=row[0], y=row[1], z=row[2]))
-        #         for row in self.pre_saved_apple_locations
-        #     ]
-        
-        # # Filter the list to only include reachable apples
-        # # reachable_apples = [p for p in apple_poses.poses if self.is_within_reach(p)]
+        # (the automatic approach to each apple lives in start_vision_approach)
 
-        # # self.get_logger().info(f"Found {len(apple_poses.poses)} apples, {len(reachable_apples)} are reachable.")
-
-        # # # Only iterate through the reachable ones
-        # # self.apple_coordinates = {f'apple_{i+1}': [p.position.x,p.position.y,p.position.z]
-        # #                             for i,p in enumerate(reachable_apples)}
-
-        # # Loop over apple locations
-        # self.get_logger().info(f"Found {len(apple_poses.poses)} apples")
-        # for idx, coord in enumerate(apple_poses.poses):
-        #     # Update base directory for new apple location
-        #     base_dir = self.batch_dir + f'apple_{0}/'
-
-            # Stage 3: Approach apple
-            # input(f'Hit enter to start with apple {idx}')
-            # self.get_logger().info(f'Approaching apple {idx}: Coord {coord}')
-            # if self.use_optimal_trajectory:
-            #     waypoints = self.call_coord_to_traj(coord)
-            #     self.trigger_arm_mover(waypoints)
-            # else:
-            #     self.trigger_move_arm_to_pose(coord)
-
-        # Stage 4: pick controller
+        # Stages 4-5: pick, home, release
         if self.enable_picking:
-            input('Hit continue to start pressure servoing and pick controller')
-            def pick_action():
-                if self.enable_picking:
-                    self.pick_controller()
-                self.configure_servo('tool0')
-
-            self.run_stage(
-                self.relative_motion_controller_topics, # I edited these to match my topics
-                base_dir + self.final_approach_and_pick_file_name_prefix,
-                servo_frame='base_link',
-                use_servo=True,
-                action_fn=pick_action
-            )
-
-            # Stage 5: home & release & save
-            self.go_to_home()
-
-            if self.PICK_PATTERN == 'eva-relative-motion':
-                if self.last_pick_state == 'done':
-                    input('Press continue to release apple')
-                    self.future = self.eva_controller_release_cli.call_async(Empty.Request())
-                    rclpy.spin_until_future_complete(self, self.future)
-                else:
-                    self.get_logger().warn(
-                        f"Skipping release prompt: pick did not complete successfully (last state: {self.last_pick_state})"
-                    )
-
-            if self.enable_recording:
-                self.save_apple_metadata(base_dir)
+            self.pick_and_release(base_dir)
 
         if self.enable_recording:
             self.save_metadata()
@@ -679,10 +1111,15 @@ class StartHarvest(Node):
 def main(args=None):
     rclpy.init(args=args)
     harvest_control = StartHarvest()
-    harvest_control.start()
-    executor = MultiThreadedExecutor()
-    rclpy.spin(harvest_control, executor=executor)
-    rclpy.shutdown()
+    try:
+        harvest_control.start()
+        executor = MultiThreadedExecutor()
+        rclpy.spin(harvest_control, executor=executor)
+    except KeyboardInterrupt:  # the GUI stops it this way once the batch is complete
+        pass
+    finally:
+        if rclpy.ok():
+            rclpy.shutdown()
 
 if __name__ == '__main__':
     main()

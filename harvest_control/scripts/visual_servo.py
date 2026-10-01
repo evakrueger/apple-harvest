@@ -28,6 +28,25 @@ from filterpy.kalman import KalmanFilter
 from ultralytics import YOLO
 import torch
 
+
+def yolo_device(requested=""):
+    """requested if given, else the GPU when this PyTorch build supports it, else the CPU.
+
+    torch.cuda.is_available() isn't enough: a PyTorch built without this GPU's architecture (e.g. a GTX 1060,
+    sm_61, with a CUDA 13 build) still reports CUDA as available and then fails on the first inference. Code built
+    for an architecture runs on later ones of the same major version, so an sm_60 build is fine for sm_61.
+    """
+    if requested:
+        return requested
+    if torch.cuda.is_available():
+        major, minor = torch.cuda.get_device_capability(0)
+        for arch in torch.cuda.get_arch_list():
+            if arch.startswith("sm_") and arch[3:].isdigit():
+                arch_major, arch_minor = int(arch[3:-1]), int(arch[-1])
+                if arch_major == major and arch_minor <= minor:
+                    return "cuda:0"
+    return "cpu"
+
 class LocalPlanner(Node):
 
     def __init__(self):
@@ -71,6 +90,8 @@ class LocalPlanner(Node):
         ### Image Processing
         self.br = CvBridge()
         self.model = YOLO(self.model_path)  # pretrained YOLOv8n model
+        self.device = yolo_device()
+        self.get_logger().info(f"YOLO runs on {self.device}")
         self.model.model = torch.compile(self.model.model)
 
         ### Tf2
@@ -201,7 +222,7 @@ class LocalPlanner(Node):
 
             # Get apple bounding boxes from yolo model
             # results = self.model(image, conf=self.yolo_conf, device='cuda', verbose=False)[0]
-            results = self.model(image, conf=self.yolo_conf, verbose=False)[0]
+            results = self.model(image, conf=self.yolo_conf, device=self.device, verbose=False)[0]
             apple_centers = []
             z_dist = []
             for i in results:

@@ -17,6 +17,7 @@ find_package(std_srvs REQUIRED)
 find_package(tf2_ros REQUIRED)
 find_package(geometry_msgs REQUIRED)
 find_package(moveit_ros_planning_interface REQUIRED)
+find_package(moveit_core REQUIRED)
 find_package(controller_manager_msgs REQUIRED)
 find_package(trajectory_msgs REQUIRED)
 find_package(harvest_interfaces)
@@ -36,6 +37,7 @@ target_compile_features(move_arm PUBLIC c_std_99 cxx_std_17)  # Require C99 and 
 ament_target_dependencies(
   move_arm
   "moveit_ros_planning_interface"
+  "moveit_core"
   "harvest_interfaces"
   "rclcpp"
   "trajectory_msgs"
@@ -82,7 +84,12 @@ install(PROGRAMS
   DESTINATION lib/${PROJECT_NAME}
 )
 
-install(TARGETS move_arm
+# thins the ~500 Hz force/torque wrench for the harvest GUI's plot (see src/wrench_throttle.cpp)
+add_executable(wrench_throttle src/wrench_throttle.cpp)
+target_compile_features(wrench_throttle PUBLIC cxx_std_17)
+ament_target_dependencies(wrench_throttle "rclcpp" "geometry_msgs")
+
+install(TARGETS move_arm wrench_throttle
   DESTINATION lib/${PROJECT_NAME})
 
 # install(TARGETS move_arm_action_based

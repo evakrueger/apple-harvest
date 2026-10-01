@@ -1,9 +1,19 @@
 <?xml version="1.0"?>
+<!--
+  Simple V-trellis tree template (environment model, not part of the robot):
+  one vertical leader branch plus 4 horizontal branches spaced evenly up it.
+  UNITS: meters and radians.
+
+  v_trellis_template.urdf next to this file is GENERATED from it. After editing, regenerate:
+    xacro v_trellis_template.xacro -o v_trellis_template.urdf
+-->
 <robot name="tree_structure" xmlns:xacro="http://www.ros.org/wiki/xacro">
 
   <!-- Parameters for branches -->
   <xacro:property name="horizontal_branch_spacing" value="1.0"/> <!-- Spacing between horizontal branches -->
-  <xacro:property name="branch_diameter" value="0.04"/>          <!-- Diameter of the horizontal branches -->
+  <!-- NOTE: despite the name, branch_diameter is used as the cylinder RADIUS below,
+       so 0.04 gives 8 cm thick branches. -->
+  <xacro:property name="branch_diameter" value="0.04"/>          <!-- Radius of the horizontal branches (see note) -->
   <xacro:property name="branch_length" value="4.0"/>              <!-- Length of the horizontal branches -->
   <xacro:property name="leader_branch_radius" value="0.08"/>      <!-- Radius of the leader branch -->
   <xacro:property name="leader_branch_length" value="4.0"/>       <!-- Length of the leader branch -->

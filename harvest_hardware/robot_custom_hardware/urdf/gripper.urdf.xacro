@@ -1,15 +1,40 @@
 <?xml version="1.0"?>
+<!--
+  End-of-arm tooling: gripper body, ejector plate, and the gripper's reference frames.
+
+  Used by both amiga_ur_gripper.urdf.xacro and ur_gripper.urdf.xacro. Those files create
+  gripper_joint (tool0 -> gripper_link); this macro builds everything hanging off it.
+
+  UNITS: meters and radians (inches x 0.0254 = m, degrees x pi/180 = rad).
+
+  tool0 FRAME (the UR flange, where everything here is measured from):
+    origin = center of the flange face
+    +z     = straight out of the flange, along the gripper
+    -y     = the side the ejector and mast camera are on ("over" the wrist)
+    +y     = the opposite side ("under" the wrist)
+  The wrist_3 body behind the flange is a cylinder of radius ~3.75 cm (UR5e collision mesh).
+-->
 <robot xmlns:xacro="http://www.ros.org/wiki/xacro">
     <xacro:macro name="gripper_macro">
 
+        <!-- ============================================================ -->
+        <!--  Frames on the gripper (offsets are from gripper_link, the   -->
+        <!--  tip, so negative z = back toward the flange).               -->
+        <!--  If you change gripper_joint's z in the top-level files,     -->
+        <!--  change these z values by the opposite amount to keep the    -->
+        <!--  frames where they physically are.                           -->
+        <!-- ============================================================ -->
+
+        <!-- Suction cups: 19.5 cm from the flange (0.25 - 0.055).
+             Yaw of -150 deg lines the frame up with the cup pattern. -->
         <joint name="gripper_scups_joint" type="fixed">
             <parent link="gripper_link" />
             <child link="gripper_scups_link" />
-            <origin xyz="0.00 0.00 -0.02" rpy="0 0 -2.618" />
+            <origin xyz="0.00 0.00 -0.055" rpy="0 0 -2.618" />
         </joint>
 
-
         <link name="gripper_scups_link">
+            <!-- Uncomment to see the frame as a small green cube in RViz -->
             <!-- <visual>
                 <geometry>
                     <box size="0.01 0.01 0.01" />
@@ -20,23 +45,26 @@
             </visual> -->
         </link>
 
-
+        <!-- Palm camera optical frame: 16.5 cm from the flange (0.25 - 0.085), on the tool axis.
+             gripper_palm_camera.py stamps its images with this frame; visual_servo.py uses it. -->
         <joint name="gripper_palm_camera_joint" type="fixed">
             <parent link="gripper_link" />
             <child link="gripper_palm_camera_optical_link" />
-            <origin xyz="0.00 0 -0.05" rpy="0 0 0" />
+            <origin xyz="0.00 0 -0.085" rpy="0 0 0" />
         </joint>
 
+        <!-- Top camera: 12.85 cm from the flange (0.25 - 0.1215), 7.2 cm toward -y (the ejector side). -->
         <joint name="gripper_top_camera_joint" type="fixed">
             <parent link="gripper_link" />
             <child link="gripper_top_camera_link" />
-            <origin xyz="0.00 -.072 -0.0865" rpy="0 0 0" />
+            <origin xyz="0.00 -.072 -0.1215" rpy="0 0 0" />
         </joint>
 
         <link name="gripper_top_camera_link">
         </link>
 
         <link name="gripper_palm_camera_optical_link">
+            <!-- Uncomment to see the frame as a small green box in RViz -->
             <!-- <visual>
                 <geometry>
                     <box size="0.03 0.03 0.01" />
@@ -47,21 +75,70 @@
             </visual> -->
         </link>
 
-        <link name="gripper_link">
+        <!-- ============================================================ -->
+        <!--  Ejector plate (measured on the robot)                       -->
+        <!--    22 cm wide (x) x 14 cm tall (y) x 2.5 cm thick (z)        -->
+        <!--    flush against the flange: z 0 to 0.025                   -->
+        <!--    bottom edge 1 cm above the wrist surface (3.75 + 1 cm),   -->
+        <!--    on the -y side: y -0.0475 to -0.1875                      -->
+        <!--  The joint origin is the plate's center:                     -->
+        <!--    y = -(0.0475 + 0.14/2) = -0.1175,  z = 0.025/2 = 0.0125   -->
+        <!--  If you resize it, update the box size AND the center.       -->
+        <!--  Clearance: ~1.25 cm to the gripper body, ~1.4 cm to the     -->
+        <!--  wrist. Keep a gap; if boxes overlap, MoveIt sees a          -->
+        <!--  permanent self-collision and refuses to plan.               -->
+        <!-- ============================================================ -->
+        <joint name="ejector_joint" type="fixed">
+            <parent link="tool0" />
+            <child link="ejector_link" />
+            <origin xyz="0 -0.1175 0.0125" rpy="0 0 0" />
+        </joint>
+
+        <link name="ejector_link">
         <collision>
-            <origin xyz="0 0 0" rpy="0 0 0" />
             <geometry>
-            <cylinder radius="0.05" length="0.285" />
+            <box size="0.22 0.14 0.025" />
             </geometry>
         </collision>
         <visual>
-            <origin xyz="0 0 0" rpy="0 0 0" />
             <geometry>
-            <cylinder radius="0.05" length="0.285" />
+            <box size="0.22 0.14 0.025" />
             </geometry>
+            <material name="gripper_aluminum">  <!-- same as the RealSense "aluminum" -->
+                <color rgba="0.5 0.5 0.5 1" />
+            </material>
         </visual>
         </link>
 
+        <!-- ============================================================ -->
+        <!--  Gripper body (measured on the robot)                        -->
+        <!--    square prism, 7 x 7 cm cross-section, 24 cm long          -->
+        <!--    starts 1 cm out from the flange, so it spans z 0.01-0.25  -->
+        <!--  gripper_link sits at the TIP (0.25, set by gripper_joint in -->
+        <!--  the top-level files). It is the frame MoveIt moves to the   -->
+        <!--  target (move_arm.cpp setPoseTarget) and the "gripper tip"   -->
+        <!--  in pose_listener.py / orchard_templating.py.                -->
+        <!--  The box center is 0.12 behind the tip:                      -->
+        <!--    0.25 - (0.01 + 0.24/2) = 0.12                             -->
+        <!--  If you change the length or start offset, recompute this.   -->
+        <!-- ============================================================ -->
+        <link name="gripper_link">
+        <collision>
+            <origin xyz="0 0 -0.12" rpy="0 0 0" />
+            <geometry>
+            <box size="0.07 0.07 0.24" />
+            </geometry>
+        </collision>
+        <visual>
+            <origin xyz="0 0 -0.12" rpy="0 0 0" />
+            <geometry>
+            <box size="0.07 0.07 0.24" />
+            </geometry>
+            <material name="gripper_aluminum">  <!-- same as the RealSense "aluminum" -->
+                <color rgba="0.5 0.5 0.5 1" />
+            </material>
+        </visual>
+        </link>
 
     </xacro:macro>
 </robot>

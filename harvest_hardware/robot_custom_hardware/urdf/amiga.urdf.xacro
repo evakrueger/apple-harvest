@@ -1,4 +1,20 @@
 <?xml version="1.0"?>
+<!--
+  Amiga platform with the arm-mount frame on top.
+
+  Links (all named with amiga_prefix, default "amiga__"):
+    base   root of the Amiga, attached to amiga_parent (world) with no offset
+    body   the frame mesh plus collision boxes for the things bolted to it
+    tool0  where the UR5e base mounts (the arm's base_link is attached here)
+
+  All positions are relative to amiga__base / amiga__body (the same frame).
+  UNITS: meters and radians. Several values are inch measurements converted to m
+  (e.g. 1.04775 m = 41.25 in, 0.29845 m = 11.75 in).
+
+  Used by amiga_ur_gripper.urdf.xacro.
+  Keep a small gap between these boxes and the UR5e (e.g. the rail top is at z 1.045,
+  2.75 mm under the arm base at 1.04775). Touching boxes read as a self-collision in MoveIt.
+-->
 <robot xmlns:xacro="https://ros.org/wiki/xacro" name="amiga">
 
 <xacro:macro name="amiga_macro" params="amiga_prefix:='amiga__' amiga_parent:='world' mesh_base_path">
@@ -8,6 +24,8 @@
     <material name="LightLightGrey">
         <color rgba="0.941 0.941 0.941 1.0"/>
     </material>
+    <!-- Mass and overall box (box0) are used only for the inertia estimate below.
+         box1 / box2 are currently unused. -->
     <xacro:property name="amiga_mass" value="40.0"/>
     <xacro:property name="amiga_collision_box0_x" value='1.132'/>
     <xacro:property name="amiga_collision_box0_y" value='0.800'/>
@@ -19,6 +37,10 @@
     <xacro:property name="amiga_collision_box2_y" value='0.25' />
     <xacro:property name="amiga_collision_box2_z" value='0.25' />
 
+    <!-- ARM MOUNT: pose of the UR5e base on the Amiga, relative to amiga__body.
+         position: x -0.095, y 0.306, z 1.04775 (41.25 in up, sitting on top of the rail)
+         rotation: arm base yawed 45 deg (pi/4)
+         Moving the arm on the Amiga = change these two values. -->
     <xacro:property name="amiga_tool0_mount_rotation" value="0.0 0.0 ${pi / 4}"/>
     <xacro:property name="amiga_tool0_mount_position" value="-0.095 0.306 1.04775"/>
 
@@ -27,7 +49,11 @@
     <!-- ================== -->
     <link name="${amiga_prefix}base"/>
 
+    <!-- Each part below is an <origin> (box CENTER, relative to the body) plus a <box size>
+         (full x y z lengths). Every box appears twice, once as collision (what MoveIt avoids)
+         and once as visual (what RViz shows); keep the two in sync. -->
     <link name="${amiga_prefix}body">
+        <!-- Amiga frame mesh (visual) -->
         <visual>
             <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
             <geometry>
@@ -35,7 +61,9 @@
             </geometry>
             <material name="LightLightGrey"/>
         </visual>
-        <!-- Linear Rail -->
+        <!-- Linear Rail: 1.2 m long along x, centered 11.75 in (0.29845 m) toward +y,
+             top face at z 0.97 + 0.15/2 = 1.045 -->
+
         <collision>
             <origin rpy="0.0 0.0 0.0" xyz="0.0 0.29845 0.97"/>
             <geometry>
@@ -48,7 +76,7 @@
                 <box size="1.2 0.2 0.15"/>
             </geometry>
         </visual>
-        <!-- Mast -->
+        <!-- Mast: 7 x 7 cm upright post, 0.95 m tall, centered at z 1.03 -->
         <collision>
             <origin rpy="0.0 0.0 0.0" xyz="0.57 -0.15 1.03"/>
             <geometry>
@@ -61,7 +89,7 @@
                 <box size="0.07 0.07 0.95"/>
             </geometry>
         </visual>
-        <!-- GPS & Oak cameras -->
+        <!-- GPS & Oak cameras: box on top of the mast -->
         <collision>
             <origin rpy="0.0 0.0 0.0" xyz="0.57 -0.15 1.6"/>
             <geometry>
@@ -74,7 +102,7 @@
                 <box size="0.15 0.2 0.2"/>
             </geometry>
         </visual>
-        <!-- Amiga Brain -->
+        <!-- Amiga Brain: box on the side of the mast -->
         <collision>
             <origin rpy="0.0 0.0 0.0" xyz="0.57 -0.315 1.25"/>
             <geometry>
@@ -87,13 +115,14 @@
                 <box size="0.29 0.2 0.175"/>
             </geometry>
         </visual>
-        <!-- Base -->
+        <!-- Base: the frame mesh as a collision shape -->
         <collision>
             <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
             <geometry>
                 <mesh filename="${mesh_base_path}base_mounts/frame_on_amiga_v2_simplified.stl"/>
             </geometry>
         </collision>
+        <!-- Rough inertia: 40 kg solid box of size box0. Only matters for simulation. -->
         <inertial>
             <origin rpy="0 0 0" xyz="0.0 0.0 0.0"/>
             <mass value="${amiga_mass}"/>
@@ -107,6 +136,7 @@
         </inertial>
     </link>
 
+    <!-- Arm mount frame; the UR5e base_link attaches here -->
     <link name="${amiga_prefix}tool0"/>
 
     <!-- ================== -->
@@ -122,6 +152,7 @@
         <parent link="${amiga_prefix}base"/>
         <child link="${amiga_prefix}body"/>
     </joint>
+    <!-- Arm mount pose; values come from the ARM MOUNT properties at the top -->
     <joint name="${amiga_prefix}body--${amiga_prefix}tool0" type="fixed">
         <origin rpy="${amiga_tool0_mount_rotation}" xyz="${amiga_tool0_mount_position}"/>
         <parent link="${amiga_prefix}body"/>

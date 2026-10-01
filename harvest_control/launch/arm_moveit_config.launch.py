@@ -23,6 +23,7 @@ def generate_launch_description():
         DeclareLaunchArgument('use_fake_hardware', default_value='false'),
         DeclareLaunchArgument('description_package', default_value='robot_custom_hardware'),
         DeclareLaunchArgument('description_file', default_value='amiga_ur_gripper.urdf.xacro'),
+        DeclareLaunchArgument('srdf_file', default_value='amiga_ur_gripper.srdf.xacro'),
         DeclareLaunchArgument('max_accel', default_value='0.05'),
         DeclareLaunchArgument('max_vel', default_value='0.05'),
         DeclareLaunchArgument('traj_time_step', default_value='0.05'),
@@ -66,19 +67,16 @@ def generate_launch_description():
         )
     }
 
-    # SRDF is a xacro in ur_moveit_config
-    ur_moveit_share = get_package_share_directory("ur_moveit_config")
-    srdf_relpath = "config/ur.srdf.xacro" if os.path.exists(
-        os.path.join(ur_moveit_share, "config/ur.srdf.xacro")
-    ) else "srdf/ur.srdf.xacro"
+    # SRDF: ours (description_package/srdf), which extends ur_moveit_config's with our parts' collision pairs
 
     robot_description_semantic = {
         "robot_description_semantic": ParameterValue(
             Command([
                 FindExecutable(name="xacro"), " ",
                 PathJoinSubstitution([
-                    FindPackageShare("ur_moveit_config"),
-                    srdf_relpath,
+                    FindPackageShare(LaunchConfiguration('description_package')),
+                    'srdf',
+                    LaunchConfiguration('srdf_file'),
                 ]),
                 " ",
                 TextSubstitution(text="name:="), TextSubstitution(text="ur"),

@@ -18,8 +18,9 @@ cameras:
     enabled: true
     serial: '040322070611'   # D435i
     align_depth: true
-    pointcloud: true
+    pointcloud: false        # /<name>_points: nothing uses it, and building it every frame costs CPU
     publish_tf: false        # URDF handles the mount
+    urdf_name: mast_camera   # its frames in the URDF are mast_camera_* (amiga_ur_gripper.urdf.xacro, prefix "mast_")
     record: true
 
   # Second RealSense (not currently mounted). Set its serial before enabling -- each camera needs its own.
@@ -28,7 +29,7 @@ cameras:
     enabled: false
     serial: ''
     align_depth: true
-    pointcloud: true
+    pointcloud: false        # /<name>_points: nothing uses it, and building it every frame costs CPU
     publish_tf: false
     record: true
 
@@ -50,5 +51,7 @@ cameras:
     device: 0
     record: true
 
-# RealSense camera used by apple_prediction
+# RealSense camera used by apple_prediction. Detections are transformed to world through its
+# <urdf_name>_color_optical_frame (or <name>_color_optical_frame if urdf_name isn't set), so that
+# frame must exist in the URDF.
 prediction_camera: realsense

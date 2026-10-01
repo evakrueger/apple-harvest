@@ -8,6 +8,7 @@ from launch.substitutions import Command, FindExecutable, LaunchConfiguration, P
 from launch_ros.substitutions import FindPackageShare
 import launch_ros.actions
 from launch.actions import OpaqueFunction
+from launch.conditions import IfCondition
 from harvest import cameras
 
 def generate_launch_description():
@@ -29,6 +30,10 @@ def generate_launch_description():
                                   description="Data path to save pointcloud, realsense rgb image, realsense depth image and masks from prediction node. In format home/dir/data do not add slash at the end."))
 
 
+    ### visual_servo node: off by default. Nothing in the pick workflow uses it, and idle it still costs most of a CPU
+    ### core (its TF listener handles /tf at ~250 Hz in Python). Pass visual_servo:=true to start it.
+    declared_arguments.append(DeclareLaunchArgument("visual_servo", default_value="false",
+                                  description="Start the visual_servo node (palm camera visual servoing)."))
     ### visual_servo node parameters
     declared_arguments.append(DeclareLaunchArgument("vservo_model", default_value="v9e.pt", 
                                   description="Yolo model used, can specify any model in the harvest_vision/yolo_models directory."))
@@ -55,6 +60,8 @@ def generate_launch_description():
 def launch_setup(context):
     config = cameras.load_config(LaunchConfiguration("cameras_config").perform(context))
     prediction_camera = config['prediction_camera']
+    # frames come from the URDF (publish_tf: false), where the camera may have another name
+    prediction_frame = config['cameras'][prediction_camera].get('urdf_name', prediction_camera)
     palm_cameras = [name for name, cam in config['cameras'].items() if cam['type'] == 'palm_camera']
 
     ### Nodes
@@ -70,11 +77,12 @@ def launch_setup(context):
                      "prediction_distance_max": LaunchConfiguration("prediction_distance_max"),
                      "scan_data_path": LaunchConfiguration("scan_data_path"),
                      "topic_prefix": prediction_camera,
-                     "source_frame": f"{prediction_camera}_color_optical_frame",
+                     "source_frame": f"{prediction_frame}_color_optical_frame",
                       }
                 ])
     
     vservo_node = launch_ros.actions.Node(
+                condition=IfCondition(LaunchConfiguration("visual_servo")),
                 package="harvest_control",
                 executable="visual_servo.py",
                 name="visual_servo",

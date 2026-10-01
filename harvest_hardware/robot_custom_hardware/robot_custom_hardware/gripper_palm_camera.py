@@ -11,6 +11,22 @@ import cv2
 import numpy as np
 import os
 
+
+def bgr8_to_imgmsg(bgr):
+    """sensor_msgs/Image from a BGR uint8 array.
+
+    Not cv_bridge.cv2_to_imgmsg: that fails (KeyError 16) with pip's OpenCV 5, whose image type codes differ
+    from the OpenCV 4 cv_bridge was built against.
+    """
+    msg = Image()
+    msg.height, msg.width = bgr.shape[:2]
+    msg.encoding = "bgr8"
+    msg.is_bigendian = 0
+    msg.step = msg.width * 3
+    msg.data = np.ascontiguousarray(bgr, dtype=np.uint8).tobytes()
+    return msg
+
+
 class GripperPalmCamera(Node):
     def __init__(self, resolution=(800,600), target_fr=30):
         super().__init__("gripper_palm_camera_publisher")
@@ -62,7 +78,7 @@ class GripperPalmCamera(Node):
                 ret, frame = self.camera.read()
                 image = frame
                 if ret:
-                    img_msg = self.bridge.cv2_to_imgmsg(image, "bgr8")
+                    img_msg = bgr8_to_imgmsg(image)
                     img_msg.header.stamp = self.get_clock().now().to_msg()
                     img_msg.header.frame_id = "gripper_palm_camera_optical_link"
                     self.camera_pub.publish(img_msg)

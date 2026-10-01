@@ -29,6 +29,9 @@ def generate_launch_description():
                                   description='Package containing the URDF/Xacro'))
     declared_arguments.append(DeclareLaunchArgument('description_file', default_value='amiga_ur_gripper.urdf.xacro',
                                   description='Path (relative to description_package share) to the Xacro file'))
+    declared_arguments.append(DeclareLaunchArgument('srdf_file', default_value='amiga_ur_gripper.srdf.xacro',
+                                  description='MoveIt SRDF xacro in description_package/srdf: which link pairs '
+                                              'MoveIt and Servo skip in collision checks'))
 
     ### harvest node parameter
     # The pick pattern is dependent on the controller selected with the below parameter
@@ -114,6 +117,11 @@ def generate_launch_description():
                 'launch_rviz': LaunchConfiguration('launch_moveit_rviz'),
                 'description_package': LaunchConfiguration('description_package'),
                 'description_file': LaunchConfiguration('description_file'),
+                # our SRDF (collision pairs for the gripper/ejector/Amiga); the package also carries copies of
+                # ur_moveit_config's kinematics.yaml, joint limits and rviz config, which this launch loads from it
+                'moveit_config_package': LaunchConfiguration('description_package'),
+                'moveit_config_file': LaunchConfiguration('srdf_file'),
+                'moveit_joint_limits_file': 'moveit_joint_limits.yaml',
             }.items(),
         ),
 
@@ -125,6 +133,7 @@ def generate_launch_description():
                 'use_fake_hardware': LaunchConfiguration('use_fake_hardware'),
                 'description_package': LaunchConfiguration('description_package'),
                 'description_file': LaunchConfiguration('description_file'),
+                'srdf_file': LaunchConfiguration('srdf_file'),
                 'max_accel': LaunchConfiguration('max_accel'),
                 'max_vel': LaunchConfiguration('max_vel'),
                 'traj_time_step': LaunchConfiguration('traj_time_step'),
@@ -153,6 +162,16 @@ def generate_launch_description():
             package='harvest_control',
             executable='force_filter.py',
             name='forcefilter',
+        ),
+
+        # the ~500 Hz wrench thinned to 50 Hz for the harvest GUI's force plot (bags record the full-rate topic)
+        Node(
+            package='harvest_control',
+            executable='wrench_throttle',
+            name='wrench_throttle',
+            parameters=[{'input_topic': '/force_torque_sensor_broadcaster/wrench',
+                         'output_topic': '/force_torque_sensor_broadcaster/wrench_throttled',
+                         'rate': 50.0}],
         ),
 
         Node(

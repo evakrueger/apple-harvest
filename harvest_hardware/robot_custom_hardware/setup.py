@@ -17,6 +17,8 @@ setup(
         ('share/' + package_name, ['package.xml']),
         (os.path.join('share', package_name, 'launch'), glob(os.path.join('launch', '*launch.[pxy][yma]*'))),
         (os.path.join('share', package_name, "urdf"), glob('urdf/*')),
+        (os.path.join('share', package_name, "srdf"), glob('srdf/*')),
+        (os.path.join('share', package_name, "rviz"), glob('rviz/*')),
         (os.path.join('share', package_name, 'meshes', "base_mounts"), glob(os.path.join('meshes/base_mounts/', '*'))),
         (os.path.join('share', package_name, 'meshes', "end_effectors"), glob(os.path.join('meshes/end_effectors/', '*'))),
         (os.path.join('share', package_name, 'config'), only_files(glob('config/*'))),

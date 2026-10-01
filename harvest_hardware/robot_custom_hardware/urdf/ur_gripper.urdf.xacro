@@ -1,7 +1,24 @@
 <?xml version="1.0"?>
+<!--
+  ARM ONLY (no Amiga): UR5e fixed to world + gripper/ejector + one RealSense D435i on the arm base.
+  The full robot on the Amiga is amiga_ur_gripper.urdf.xacro.
+
+  Tree:  world -> UR5e (base_link ... tool0)
+           tool0 -> gripper_link (tip), ejector_link   (from gripper.urdf.xacro)
+           base_link -> camera
+
+  This file duplicates gripper_joint from amiga_ur_gripper.urdf.xacro; keep the two in sync.
+  Unlike the Amiga file it has no mast camera or tracking marker, and it uses the upstream
+  realsense2_description macro (no prefix param), so the camera frames are plain camera_*.
+
+  UNITS: meters and radians (inches x 0.0254 = m, degrees x pi/180 = rad).
+
+  To build by hand:
+    xacro ur_gripper.urdf.xacro name:=ur -o /tmp/robot.urdf && check_urdf /tmp/robot.urdf
+-->
 <robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="$(arg name)">
 
-  <!-- keep the basics -->
+  <!-- UR driver args: these just pass through to ur_robot below. Launch files set most of them. -->
   <xacro:arg name="name" default="ur"/>
   <xacro:arg name="ur_type" default="ur5e"/>  <!-- absorbs CLI arg; we won't pass it to ur_robot -->
   <xacro:arg name="tf_prefix" default=""/>
@@ -38,7 +55,10 @@
   <xacro:arg name="initial_positions_file" default="$(find robot_custom_hardware)/config/initial_positions.yaml"/>
   <xacro:property name="initial_positions_file" default="$(arg initial_positions_file)"/>
 
-  <!-- Realsense args -->
+  <!-- Realsense args.
+       true:  the URDF includes the camera's internal frames (depth / color / infra optical)
+              at nominal factory offsets.
+       false: (default here) the realsense driver must publish those frames itself. -->
   <xacro:arg name="use_nominal_extrinsics" default="false" />
 
   <!-- CRITICAL: define the four args with the names the UR macro expects -->
@@ -97,15 +117,20 @@
     <origin xyz="0 0 0" rpy="0 0 0"/>
   </xacro:ur_robot>
 
-  <!-- mount gripper -->
+  <!-- Gripper mount: gripper_link = the gripper TIP, 25 cm straight out from the flange.
+       MUST MATCH gripper_joint in amiga_ur_gripper.urdf.xacro; see the notes there on
+       what else to update when this changes. -->
   <joint name="gripper_joint" type="fixed">
     <parent link="tool0"/>
     <child  link="gripper_link"/>
-    <origin xyz="0.00 0.00 0.215" rpy="0 0 0"/>
+    <origin xyz="0.00 0.00 0.25" rpy="0 0 0"/>
   </joint>
 
+  <!-- Gripper body, ejector plate, suction-cup / palm / top camera frames -->
   <xacro:gripper_macro/>
 
+  <!-- RealSense fixed near the arm, relative to base_link: 0.476 m (18.75 in) x,
+       -0.491 m y, 0.467 m up, yawed 1.8852 rad (~108 deg). -->
   <xacro:sensor_d435i parent="base_link" use_nominal_extrinsics="$(arg use_nominal_extrinsics)">
     <origin xyz="0.47625 -0.4907 0.4667" rpy="0 0 1.8852"/>
   </xacro:sensor_d435i>

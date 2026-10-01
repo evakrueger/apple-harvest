@@ -19,6 +19,17 @@
 <!--
 This is the URDF model for the Intel RealSense 435i camera, in it's
 aluminum peripherial evaluation case.
+
+LOCAL COPY of realsense2_description's _d435i.urdf.xacro, changed to take a "prefix" param so
+the robot can have two cameras (mast_camera_*, base_camera_*) without frame-name clashes.
+amiga_ur_gripper.urdf.xacro includes this copy; ur_gripper.urdf.xacro uses the upstream one.
+
+Usage:
+  <xacro:sensor_d435i parent="some_link" prefix="mast_" use_nominal_extrinsics="true">
+    <origin xyz="..." rpy="..."/>   <- pose of the camera's bottom screw hole in parent
+  </xacro:sensor_d435i>
+Frames created: ${prefix}camera_bottom_screw_frame, ${prefix}camera_link, and (when
+use_nominal_extrinsics is true) ${prefix}camera_color_optical_frame, _depth_optical_frame, etc.
 -->
 
 <robot name="sensor_d435i" xmlns:xacro="http://ros.org/wiki/xacro">
