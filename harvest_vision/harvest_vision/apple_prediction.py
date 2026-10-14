@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import json
+import os
 import time
 from threading import Event, Lock
 
@@ -179,7 +180,7 @@ class ApplePredictionFromTopics(Node):
 
         # --- RANSAC config ---
         self.ransac_thresh = 1e-4
-        self.ransac_iters = 1000
+        self.ransac_iters = 100
 
         self.get_logger().info(
             "ApplePredictionFromTopics ready. Subscribing:\n"
@@ -304,7 +305,9 @@ class ApplePredictionFromTopics(Node):
         self._publish_markers(poses_world_f, radii_f, frame_id=self.target_frame)
 
         # 6) Publish annotated image and detections (filtered)
-        self._publish_annotated_image(color_bgr, bboxes_f, header=color_msg.header)
+        annotated = self._publish_annotated_image(color_bgr, bboxes_f, header=color_msg.header)
+        if req.annotated_image_path and annotated is not None:
+            self._save_annotated_image(annotated, req.annotated_image_path)
         self._publish_detections(poses_world_f, radii_f, bboxes_f, color_msg.header.stamp, Wc, Hc)
 
         # 7) Fill response (filtered)
@@ -478,9 +481,21 @@ class ApplePredictionFromTopics(Node):
         self.detections_pub.publish(String(data=json.dumps({
             "stamp": stamp.sec + stamp.nanosec * 1e-9, "width": int(width), "height": int(height), "apples": apples})))
 
+    def _save_annotated_image(self, bgr_img, path):
+        # /apple_annotated has never made it into the prediction bags, so the caller can ask for a PNG as well.
+        # A failed save only warns: the detections are still good.
+        try:
+            os.makedirs(os.path.dirname(os.path.abspath(path)), exist_ok=True)
+            if not cv2.imwrite(path, bgr_img):
+                raise OSError("cv2.imwrite returned False")
+            self.get_logger().info(f"Saved annotated image to {path}")
+        except Exception as e:
+            self.get_logger().warn(f"Could not save annotated image to {path}: {e}")
+
     def _publish_annotated_image(self, bgr_img, bboxes, header=None):
+        """Draws the numbered boxes, publishes the result on apple_annotated and returns it."""
         if bgr_img is None:
-            return
+            return None
 
         annotated = bgr_img.copy()
         H, W = annotated.shape[:2]
@@ -531,6 +546,7 @@ class ApplePredictionFromTopics(Node):
             msg.header.stamp = self.get_clock().now().to_msg()
             msg.header.frame_id = self.source_frame
         self.annotated_pub.publish(msg)
+        return annotated
 
 
 def main():

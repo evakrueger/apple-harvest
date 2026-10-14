@@ -133,7 +133,8 @@ class StartHarvest(Node):
         # 'manual': the arm is already at the apple (moved there in freedrive); 'vision': find apples with the
         # RealSense (apple_prediction) and move to each one with MoveIt before picking
         self.declare_parameter('approach', 'manual')
-        self.declare_parameter('max_apples', 0)            # vision: how many reachable apples to pre-select, nearest first (0 = all)
+        self.declare_parameter('max_apples', 0)            # vision: how many apples to pre-select, nearest first (0 = all)
+        self.declare_parameter('check_reachability', True)  # vision: check the selected apples' reach before leaving the scan pose
         self.declare_parameter('approach_standoff', APPROACH_STANDOFF)  # vision: m short of the apple the approach stops
         self.declare_parameter('move_to_scan_pose', True)  # vision: move to the scan pose (move_arm.cpp) before looking for apples
 
@@ -149,6 +150,7 @@ class StartHarvest(Node):
         self.approach = self.get_parameter('approach').get_parameter_value().string_value
         self.max_apples = self.get_parameter('max_apples').get_parameter_value().integer_value
         self.move_to_scan_pose = self.get_parameter('move_to_scan_pose').get_parameter_value().bool_value
+        self.check_reachability = self.get_parameter('check_reachability').get_parameter_value().bool_value
         self.approach_standoff = self.get_parameter('approach_standoff').get_parameter_value().double_value
         if self.approach not in ('manual', 'vision'):
             raise ValueError(f"approach must be 'manual' or 'vision', not '{self.approach}'")
@@ -422,6 +424,10 @@ class StartHarvest(Node):
     def start_apple_prediction(self, timeout_sec=60.0):
         # A scan takes a few seconds (longer on CPU); no answer in a minute means apple_prediction crashed or hung
         self.request = ApplePrediction.Request()
+        if self.enable_recording:
+            # /apple_annotated never makes it into the prediction bag, so have apple_prediction save it as a PNG
+            self.request.annotated_image_path = (
+                self.batch_dir + f'{self.prediction_file_name_prefix}_{time.strftime("%Y%m%d_%H%M%S")}.png')
         self.future = self.start_apple_prediction_client.call_async(self.request)
         rclpy.spin_until_future_complete(self, self.future, timeout_sec=timeout_sec)
         if not self.future.done() or self.future.result() is None:
@@ -945,8 +951,8 @@ class StartHarvest(Node):
             self.save_apple_metadata(apple_dir, apple_position)
 
     def parse_apple_selection(self, answer, default, candidates):
-        # blank = the default selection, 'none' = nothing, else the numbers in the answer. Unreachable or unknown
-        # numbers are dropped; the rest are picked nearest first.
+        # blank = the default selection, 'none' = nothing, else the numbers in the answer. Unknown numbers are
+        # dropped; the rest are picked nearest first.
         answer = answer.strip().lower()
         if not answer:
             ids = default
@@ -958,9 +964,7 @@ class StartHarvest(Node):
         for i in ids:
             if i not in by_id:
                 self.get_logger().warn(f'There is no apple {i}; ignoring it')
-            elif not by_id[i]['reachable']:
-                self.get_logger().warn(f'Apple {i} is not reachable ({by_id[i]["reason"]}); ignoring it')
-        ids = [i for i in dict.fromkeys(ids) if i in by_id and by_id[i]['reachable']]
+        ids = [i for i in dict.fromkeys(ids) if i in by_id]
         return sorted(ids, key=lambda i: by_id[i]['distance'])
 
     def start_vision_approach(self):
@@ -1005,24 +1009,46 @@ class StartHarvest(Node):
                                'Restart the robot stack so the current move_arm is running; stopping.')
         candidates = []
         for i, p in enumerate(apple_poses.poses):
-            ok, reason, _, heading = self.can_reach(p, start=home)
             distance = self.distance_from_arm_base(p)
-            approach = self.approach_turn_text(heading if ok else self.approach_heading(p))
             self.get_logger().info(f'  apple {i} at ({p.position.x:.3f}, {p.position.y:.3f}, {p.position.z:.3f}), '
-                                   f'{distance:.2f} m from the arm base, approach {approach}: {reason}')
+                                   f'{distance:.2f} m from the arm base')
             candidates.append({'id': i, 'position': [round(p.position.x, 3), round(p.position.y, 3), round(p.position.z, 3)],
-                               'distance': round(distance, 3), 'reachable': ok, 'reason': reason})
-        reachable = sorted((c for c in candidates if c['reachable']), key=lambda c: c['distance'])
-        self.get_logger().info(f'Found {len(candidates)} apples, {len(reachable)} within reach')
+                               'distance': round(distance, 3), 'reachable': None, 'reason': 'not checked yet'})
+        self.get_logger().info(f'Found {len(candidates)} apples')
         # one line the GUI turns into its apple list
         print('APPLE_CANDIDATES ' + json.dumps(candidates), flush=True)
 
+        # Choose first, then check reach for the chosen apples only: the check takes seconds per apple
         selected = []
-        if reachable:
-            default = [c['id'] for c in (reachable[:self.max_apples] if self.max_apples > 0 else reachable)]
+        if candidates:
+            nearest = sorted(candidates, key=lambda c: c['distance'])
+            default = [c['id'] for c in (nearest[:self.max_apples] if self.max_apples > 0 else nearest)]
             answer = input(f'Select apples to pick (numbers, or none) [{" ".join(map(str, default))}]: ')
             selected = self.parse_apple_selection(answer, default, candidates)
-        self.get_logger().info(f'Picking apples {selected}' if selected else 'No apples selected')
+
+        # can_reach() from home for each selected apple, reused by its approach (same inputs, same answer). With
+        # check_reachability off, each apple is checked just before its approach instead (the approach needs the arm
+        # configuration the check finds), so the arm leaves sooner but an unreachable apple is only skipped then.
+        reach = {}
+        if selected and self.check_reachability:
+            self.get_logger().info(f'Checking reach of apples {selected}')
+            for c in candidates:
+                c['selected'] = c['id'] in selected
+                if not c['selected']:
+                    continue
+                p = apple_poses.poses[c['id']]
+                reach[c['id']] = self.can_reach(p, start=home)
+                ok, reason, _, heading = reach[c['id']]
+                approach = self.approach_turn_text(heading if ok else self.approach_heading(p))
+                self.get_logger().info(f'  apple {c["id"]}, approach {approach}: {reason}')
+                c['reachable'], c['reason'] = ok, reason
+            not_reachable = [i for i in selected if not reach[i][0]]
+            if not_reachable:
+                self.get_logger().warn(f'Skipping apples {not_reachable}: not reachable (reasons above)')
+            selected = [i for i in selected if reach[i][0]]
+            # the GUI updates its list and the camera view with the results
+            print('APPLE_CANDIDATES ' + json.dumps(candidates), flush=True)
+        self.get_logger().info(f'Picking apples {selected}' if selected else 'No apples to pick')
 
         # Back home once the apples are chosen (the arm stays at the scan pose while you choose): the approaches
         # start from there
@@ -1040,12 +1066,16 @@ class StartHarvest(Node):
             # point (approach_standoff short), pointing along the approach; the pick controller servos the rest of the
             # way. (One straight line all the way from home could fail partway: IK jumps over the long move while the
             # wrist turns.)
-            # same check as at the scan (the arm is home now); the move uses the configuration and heading it found
-            ok, reason, joints, heading = self.can_reach(apple, start=home)
+            # the check from before going home, or now with check_reachability off; the move uses the configuration
+            # and heading it found
+            ok, reason, joints, heading = reach[idx] if idx in reach else self.can_reach(apple, start=home)
             if not ok and not self.use_optimal_trajectory:
                 self.get_logger().error(f'Apple {idx} is not reachable from here ({reason}); skipping it')
                 continue
             turn = self.approach_turn_text(heading) if ok else 'straight ahead'
+            input('Press continue to release apple')
+            self.future = self.eva_controller_release_cli.call_async(Empty.Request())
+            rclpy.spin_until_future_complete(self, self.future)
             input(f'Hit continue to move to apple {idx} at ({p.x:.3f}, {p.y:.3f}, {p.z:.3f}), approaching '
                   f'{turn}, stopping {self.approach_standoff * 100:.0f} cm short')
             self.get_logger().info(f'Approaching apple {idx} ({turn})')

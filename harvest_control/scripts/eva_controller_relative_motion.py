@@ -31,8 +31,8 @@ TOF_CONTROLLER = True   # change to False to use a distance-only trigger (not re
 PRESSURE_CONTROLLER = True  # change to False to stop pressure threshold logic
 RF_CONTROLLER = False # not fully debugged when true. don't change to true.
 
-PRESSURE_THRESHOLD = -56    # this is a "good enough" pressure to reach, to continue onto picking motion
-PRESSURE_CONTROLLER_TIMEOUT = 5.0   # waits 5 seconds before starting picking motion
+PRESSURE_THRESHOLD = -45    # this is a "good enough" pressure to reach, to continue onto picking motion
+PRESSURE_CONTROLLER_TIMEOUT = 10.0   # waits 5 seconds before starting picking motion
 
 PICKING_TIME = 2.0
 

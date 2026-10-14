@@ -1,2 +1,5 @@
+# Optional: when set, apple_prediction also saves the annotated scan image (detections boxed and numbered) as a PNG
+# at this path; empty saves nothing
+string annotated_image_path
 ---
 geometry_msgs/PoseArray apple_poses

@@ -1,4 +1,4 @@
-# Vision approach scan pose, set from the harvest GUI (Preferences > Set scan pose to current arm
+# Scan pose, set from the harvest GUI (Preferences > Set scan pose to current arm
 # position). Joint positions in radians. Delete this file to use the scan pose built into move_arm.cpp.
 joint_names:
 - shoulder_pan_joint
@@ -8,10 +8,10 @@ joint_names:
 - wrist_2_joint
 - wrist_3_joint
 positions:
-- 1.88184
-- -2.21815
-- 2.06764
-- 3.95087
-- -2.011
-- 0.10326
-saved: '2026-09-30 11:32:37'
+- 1.57076
+- -2.04207
+- 2.44039
+- 2.90004
+- -1.57067
+- 5.0e-05
+saved: '2026-10-07 10:05:22'

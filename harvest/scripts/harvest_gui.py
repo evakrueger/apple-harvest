@@ -13,8 +13,9 @@ Control tab
   - runs start_harvest.py, turning its input() prompts into a Continue button. Approach:
       Freedrive: you move the arm to the apple by hand first
       Vision:    start_harvest finds apples with the RealSense (apple_prediction, needs Vision running). You tick
-                 which apples to pick (they're numbered on the camera view in the Apples tab), then it moves the
-                 gripper 15 cm in front of each with MoveIt, asking for Continue before each move
+                 which apples to pick (they're numbered on the camera view in the Apples tab), it checks they're
+                 reachable (can be turned off in Preferences), then it moves the gripper 15 cm in front of each with
+                 MoveIt, asking for Continue before each move
   - moves the finished batch to the archive directory
 Monitor tab
   - live camera views (the RealSense one with the latest apple detections) and plots of vacuum pressure, ToF,
@@ -88,7 +89,7 @@ VACUUM_OVERRIDES = ['auto', 'on', 'off']  # relative_motion's vacuum_override pa
 APPROACHES = {'manual': 'Freedrive (move the arm by hand)', 'vision': 'Vision (RealSense finds the apple)'}
 APPLE_PREDICTION_SERVICE = '/apple_prediction'
 DETECTIONS_TOPIC = '/apple_detections'  # apple_prediction's latest detections (JSON), drawn on the live camera view
-CANDIDATES_PREFIX = 'APPLE_CANDIDATES '  # start_harvest's line listing the scanned apples and whether they're reachable
+CANDIDATES_PREFIX = 'APPLE_CANDIDATES '  # start_harvest's line listing the scanned apples (and, once checked, their reach)
 SELECT_PROMPT = 'Select apples to pick'  # start_harvest's prompt for which apples to pick
 # cancelling all goals on this stops any MoveIt motion (approach, go home) and holds the arm where it is
 CANCEL_TRAJECTORY_SERVICE = f'/{TRAJECTORY_CONTROLLER}/follow_joint_trajectory/_action/cancel_goal'
@@ -736,9 +737,9 @@ class HarvestGui(QtWidgets.QMainWindow):
         self.apple_view = CameraView()
         apples_layout.addWidget(self.apple_view, 1)
         legend = QtWidgets.QLabel(f'<span style="color:{STATUS_COLORS["good"]}">■</span> will pick &nbsp; '
-                                  f'<span style="color:{STATUS_COLORS["warning"]}">■</span> reachable, not ticked &nbsp; '
+                                  f'<span style="color:{STATUS_COLORS["warning"]}">■</span> not ticked &nbsp; '
                                   f'<span style="color:{STATUS_COLORS["critical"]}">■</span> out of reach &nbsp; '
-                                  f'<span style="color:{SERIES_COLORS[0]}">■</span> detected (reach not checked yet)')
+                                  f'<span style="color:{SERIES_COLORS[0]}">■</span> detected (not listed yet)')
         legend.setWordWrap(True)
         apples_layout.addWidget(legend)
         logs.addTab(self.apples_tab, 'Apples')
@@ -853,6 +854,14 @@ class HarvestGui(QtWidgets.QMainWindow):
         self.move_to_scan_check.setToolTip('Vision: scan from the scan pose (see Poses). Unchecked: scan from wherever '
                                            'the arm is (e.g. aim the wrist camera at the tree in freedrive first)')
         form.addRow('', self.move_to_scan_check)
+        self.check_reach_check = QtWidgets.QCheckBox('Check the ticked apples are reachable before moving')
+        self.check_reach_check.setChecked(s.value('check_reachability', True, type=bool))
+        self.check_reach_check.setToolTip('Vision: once you Continue, check each ticked apple can be picked (MoveIt, a '
+                                          'few seconds per apple) and drop the ones that can\'t, before the arm leaves '
+                                          'the scan pose. Unchecked: each apple is checked just before its approach '
+                                          'instead, so the arm leaves sooner but an out-of-reach apple is only '
+                                          'skipped when its turn comes.')
+        form.addRow('', self.check_reach_check)
         self.standoff_spin = QtWidgets.QDoubleSpinBox(decimals=1, minimum=5.0, maximum=40.0, singleStep=1.0, suffix=' cm')
         self.standoff_spin.setValue(s.value('approach_standoff_cm', 15.0, type=float))
         self.standoff_spin.setToolTip('Vision: how far short of the apple the arm stops before the pick controller '
@@ -1010,6 +1019,8 @@ class HarvestGui(QtWidgets.QMainWindow):
         parts = [f'Approach: <b>{self.approach_combo.currentText()}</b>']
         if vision:
             parts.append(f'standoff {self.standoff_spin.value():.0f} cm')
+            if not self.check_reach_check.isChecked():
+                parts.append('reach check <b>off</b>')
         parts.append(f'speed {self.approach_speed_spin.value()} % / home {self.home_speed_spin.value()} %')
         parts.append('bags ' + ('on' if self.record_bags.isChecked() else '<b>off</b>'))
         self.pick_settings_label.setText(', '.join(parts) + ' (change on the Preferences tab)')
@@ -1106,6 +1117,7 @@ class HarvestGui(QtWidgets.QMainWindow):
         self.approach_combo.setEnabled(not picking and not self.busy)
         vision = self.approach_combo.currentData() == 'vision'
         self.move_to_scan_check.setEnabled(vision and not picking and not self.busy)
+        self.check_reach_check.setEnabled(vision and not picking and not self.busy)
         for btn in self.vacuum_btns.values():
             btn.setEnabled(self.arm_ready)  # usable mid-pick: that's the point
         self.archive_now_btn.setEnabled(not picking)
@@ -1316,6 +1328,7 @@ class HarvestGui(QtWidgets.QMainWindow):
             params = []
             if vision:
                 params += ['approach:=vision', f'move_to_scan_pose:={str(self.move_to_scan_check.isChecked()).lower()}',
+                           f'check_reachability:={str(self.check_reach_check.isChecked()).lower()}',
                            f'approach_standoff:={self.standoff_spin.value() / 100.0:.3f}']
             if not self.record_bags.isChecked():
                 params.append('enable_recording:=false')
@@ -1413,20 +1426,25 @@ class HarvestGui(QtWidgets.QMainWindow):
 
     # ---------- apple selection ----------
     def _show_candidates(self, candidates):
-        # all scanned apples stay in self.candidates for the camera view (unreachable ones drawn red); only the
-        # reachable ones go in the list to tick (the reasons for the others are in the Harvest log)
+        # start_harvest lists the scanned apples twice: right after the scan, reach not checked yet ('reachable'
+        # None), to tick; then, unless the reach check is off, with the ticked ones checked ('selected' and
+        # 'reachable' set). Out-of-reach apples stay in the list, unticked, with the reason as their tooltip.
         self.candidates = candidates
-        reachable = sorted((c for c in candidates if c['reachable']), key=lambda c: c['distance'])
         self.apple_list.clear()
         self.apple_list.setEnabled(False)  # until start_harvest asks
-        self.apple_list.setVisible(bool(reachable))
-        for c in reachable:
+        self.apple_list.setVisible(bool(candidates))
+        for c in sorted(candidates, key=lambda c: c['distance']):
             x, y, z = c['position']
             item = QtWidgets.QListWidgetItem(f"Apple {c['id']}: {c['distance']:.2f} m from the arm "
-                                             f"({x:.2f}, {y:.2f}, {z:.2f})")
+                                             f"({x:.2f}, {y:.2f}, {z:.2f})"
+                                             + (' - out of reach' if c['reachable'] is False else ''))
             item.setData(QtCore.Qt.UserRole, c['id'])
-            item.setFlags(QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsUserCheckable)
-            item.setCheckState(QtCore.Qt.Unchecked)
+            if c['reachable'] is False:
+                item.setFlags(QtCore.Qt.ItemIsEnabled)
+                item.setToolTip(c['reason'])
+            else:
+                item.setFlags(QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsUserCheckable)
+                item.setCheckState(QtCore.Qt.Checked if c.get('selected') else QtCore.Qt.Unchecked)
             self.apple_list.addItem(item)
         if candidates:
             self.logs.setCurrentWidget(self.apples_tab)
@@ -1452,7 +1470,7 @@ class HarvestGui(QtWidgets.QMainWindow):
             candidate = by_id.get(apple['id'])
             if candidate is None:
                 color, text = SERIES_COLORS[0], f"{apple['id']}"
-            elif not candidate['reachable']:
+            elif candidate['reachable'] is False:
                 color, text = STATUS_COLORS['critical'], f"{apple['id']} out of reach"
             elif apple['id'] in selected:
                 color, text = STATUS_COLORS['good'], f"{apple['id']} pick"
@@ -1552,6 +1570,7 @@ class HarvestGui(QtWidgets.QMainWindow):
                            ('reset_esp_before', self.reset_esp_before.isChecked()),
                            ('approach', self.approach_combo.currentData()),
                            ('move_to_scan_pose', self.move_to_scan_check.isChecked()),
+                           ('check_reachability', self.check_reach_check.isChecked()),
                            ('approach_standoff_cm', self.standoff_spin.value()),
                            ('approach_speed_pct', self.approach_speed_spin.value()),
                            ('home_speed_pct', self.home_speed_spin.value()),

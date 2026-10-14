@@ -1,0 +1,4557 @@
+{
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day1/final_approach_and_pick_20251028_130627.db3": {
+  "label": "na",
+  "labeled_at": "2026-10-13T11:34:45",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day1/final_approach_and_pick_20251028_130627.db3",
+   "name": "final_approach_and_pick_20251028_130627.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761681988008630452,
+   "duration_s": 5.045521978,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw"
+   ]
+  }
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day1/final_approach_and_pick_20251028_133442.db3": {
+  "label": "na",
+  "labeled_at": "2026-10-13T11:34:48",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day1/final_approach_and_pick_20251028_133442.db3",
+   "name": "final_approach_and_pick_20251028_133442.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761683682830898990,
+   "duration_s": 5.193794859,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw"
+   ]
+  }
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day1/final_approach_and_pick_20251028_133550.db3": {
+  "label": "na",
+  "labeled_at": "2026-10-13T11:34:49",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day1/final_approach_and_pick_20251028_133550.db3",
+   "name": "final_approach_and_pick_20251028_133550.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761683751730957461,
+   "duration_s": 4.75373394,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw"
+   ]
+  }
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day1/final_approach_and_pick_20251028_133742.db3": {
+  "label": "na",
+  "labeled_at": "2026-10-13T11:34:50",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day1/final_approach_and_pick_20251028_133742.db3",
+   "name": "final_approach_and_pick_20251028_133742.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761683863631018317,
+   "duration_s": 4.500070093,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw"
+   ]
+  }
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day1/final_approach_and_pick_20251028_134003.db3": {
+  "label": "na",
+  "labeled_at": "2026-10-13T11:34:55",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day1/final_approach_and_pick_20251028_134003.db3",
+   "name": "final_approach_and_pick_20251028_134003.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761684003600258098,
+   "duration_s": 5.14709406,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw"
+   ]
+  }
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day1/final_approach_and_pick_20251028_134444.db3": {
+  "label": "na",
+  "labeled_at": "2026-10-13T11:35:09",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day1/final_approach_and_pick_20251028_134444.db3",
+   "name": "final_approach_and_pick_20251028_134444.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761684285271540805,
+   "duration_s": 22.53365408,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw"
+   ]
+  }
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day1/final_approach_and_pick_20251028_135113.db3": {
+  "label": "na",
+  "labeled_at": "2026-10-13T11:35:12",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day1/final_approach_and_pick_20251028_135113.db3",
+   "name": "final_approach_and_pick_20251028_135113.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761684673690600714,
+   "duration_s": 5.133991867,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw"
+   ]
+  }
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day1/final_approach_and_pick_20251028_135417.db3": {
+  "label": "na",
+  "labeled_at": "2026-10-13T11:35:15",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day1/final_approach_and_pick_20251028_135417.db3",
+   "name": "final_approach_and_pick_20251028_135417.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761684858177621728,
+   "duration_s": 3.872597867,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw"
+   ]
+  }
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day1/final_approach_and_pick_20251028_135510.db3": {
+  "label": "na",
+  "labeled_at": "2026-10-13T11:35:17",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day1/final_approach_and_pick_20251028_135510.db3",
+   "name": "final_approach_and_pick_20251028_135510.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761684911349125809,
+   "duration_s": 0.608770501,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": []
+  }
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day1/final_approach_and_pick_20251028_135822.db3": {
+  "label": "na",
+  "labeled_at": "2026-10-13T11:35:18",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day1/final_approach_and_pick_20251028_135822.db3",
+   "name": "final_approach_and_pick_20251028_135822.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761685102814484016,
+   "duration_s": 1.227227028,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw"
+   ]
+  }
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day1/final_approach_and_pick_20251028_140017.db3": {
+  "label": "na",
+  "labeled_at": "2026-10-13T11:35:19",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day1/final_approach_and_pick_20251028_140017.db3",
+   "name": "final_approach_and_pick_20251028_140017.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761685218617173772,
+   "duration_s": 0.880576493,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw"
+   ]
+  }
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day1/final_approach_and_pick_20251028_140416.db3": {
+  "label": "na",
+  "labeled_at": "2026-10-13T11:35:29",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day1/final_approach_and_pick_20251028_140416.db3",
+   "name": "final_approach_and_pick_20251028_140416.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761685457362273417,
+   "duration_s": 6.866670828,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw"
+   ]
+  }
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day1/final_approach_and_pick_20251028_140707.db3": {
+  "label": "na",
+  "labeled_at": "2026-10-13T11:35:40",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day1/final_approach_and_pick_20251028_140707.db3",
+   "name": "final_approach_and_pick_20251028_140707.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761685627814693100,
+   "duration_s": 10.229721161,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw"
+   ]
+  }
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day1/final_approach_and_pick_20251028_141813.db3": {
+  "label": "na",
+  "labeled_at": "2026-10-13T11:35:51",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day1/final_approach_and_pick_20251028_141813.db3",
+   "name": "final_approach_and_pick_20251028_141813.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761686293946335191,
+   "duration_s": 10.13075729,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw"
+   ]
+  }
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day1/final_approach_and_pick_20251028_142320.db3": {
+  "label": "na",
+  "labeled_at": "2026-10-13T11:36:11",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day1/final_approach_and_pick_20251028_142320.db3",
+   "name": "final_approach_and_pick_20251028_142320.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761686601652017934,
+   "duration_s": 29.42303953,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw"
+   ]
+  }
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day1/final_approach_and_pick_20251028_142529.db3": {
+  "label": "na",
+  "labeled_at": "2026-10-13T11:36:22",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day1/final_approach_and_pick_20251028_142529.db3",
+   "name": "final_approach_and_pick_20251028_142529.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761686729435330059,
+   "duration_s": 10.147610188,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw"
+   ]
+  }
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day1/final_approach_and_pick_20251028_142803.db3": {
+  "label": "na",
+  "labeled_at": "2026-10-13T11:36:40",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day1/final_approach_and_pick_20251028_142803.db3",
+   "name": "final_approach_and_pick_20251028_142803.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761686883886506684,
+   "duration_s": 54.859571503,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw"
+   ]
+  }
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day1/final_approach_and_pick_20251028_143124.db3": {
+  "label": "na",
+  "labeled_at": "2026-10-13T11:36:47",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day1/final_approach_and_pick_20251028_143124.db3",
+   "name": "final_approach_and_pick_20251028_143124.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761687084464837980,
+   "duration_s": 33.064298272,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw"
+   ]
+  }
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day1/final_approach_and_pick_20251028_143506.db3": {
+  "label": "na",
+  "labeled_at": "2026-10-13T11:36:56",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day1/final_approach_and_pick_20251028_143506.db3",
+   "name": "final_approach_and_pick_20251028_143506.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761687308036296735,
+   "duration_s": 29.268573954,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw"
+   ]
+  }
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day1/final_approach_and_pick_20251028_143901.db3": {
+  "label": "pick",
+  "labeled_at": "2026-10-13T11:37:20",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day1/final_approach_and_pick_20251028_143901.db3",
+   "name": "final_approach_and_pick_20251028_143901.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761687542077879965,
+   "duration_s": 19.285767742,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw"
+   ]
+  },
+  "time_ns": 1761687559045531083,
+  "time_s": 16.967651118
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day1/final_approach_and_pick_20251028_144228.db3": {
+  "label": "na",
+  "labeled_at": "2026-10-13T11:38:08",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day1/final_approach_and_pick_20251028_144228.db3",
+   "name": "final_approach_and_pick_20251028_144228.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761687749457064376,
+   "duration_s": 204.993637271,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw"
+   ]
+  }
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day1/final_approach_and_pick_20251028_144814.db3": {
+  "label": "na",
+  "labeled_at": "2026-10-13T11:38:19",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day1/final_approach_and_pick_20251028_144814.db3",
+   "name": "final_approach_and_pick_20251028_144814.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761688096130650635,
+   "duration_s": 53.236419543,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw"
+   ]
+  }
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day1/final_approach_and_pick_20251028_145259.db3": {
+  "label": "na",
+  "labeled_at": "2026-10-13T11:38:24",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day1/final_approach_and_pick_20251028_145259.db3",
+   "name": "final_approach_and_pick_20251028_145259.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761688380122214934,
+   "duration_s": 4.66932621,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw"
+   ]
+  }
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day1/final_approach_and_pick_20251028_145436.db3": {
+  "label": "na",
+  "labeled_at": "2026-10-13T11:38:39",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day1/final_approach_and_pick_20251028_145436.db3",
+   "name": "final_approach_and_pick_20251028_145436.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761688478040450282,
+   "duration_s": 47.228246437,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw"
+   ]
+  }
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day1/final_approach_and_pick_20251028_145928.db3": {
+  "label": "na",
+  "labeled_at": "2026-10-13T11:38:43",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day1/final_approach_and_pick_20251028_145928.db3",
+   "name": "final_approach_and_pick_20251028_145928.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761688769345140222,
+   "duration_s": 4.910614223,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw"
+   ]
+  }
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day1/final_approach_and_pick_20251028_150024.db3": {
+  "label": "na",
+  "labeled_at": "2026-10-13T11:39:04",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day1/final_approach_and_pick_20251028_150024.db3",
+   "name": "final_approach_and_pick_20251028_150024.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761688825294264059,
+   "duration_s": 51.051479278,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw"
+   ]
+  }
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day1/final_approach_and_pick_20251028_150221.db3": {
+  "label": "na",
+  "labeled_at": "2026-10-13T11:39:15",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day1/final_approach_and_pick_20251028_150221.db3",
+   "name": "final_approach_and_pick_20251028_150221.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761688941797127526,
+   "duration_s": 24.431155262,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw"
+   ]
+  }
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day1/final_approach_and_pick_20251028_150550.db3": {
+  "label": "na",
+  "labeled_at": "2026-10-13T11:39:23",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day1/final_approach_and_pick_20251028_150550.db3",
+   "name": "final_approach_and_pick_20251028_150550.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761689151490762021,
+   "duration_s": 23.39682565,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw"
+   ]
+  }
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day1/final_approach_and_pick_20251028_151257.db3": {
+  "label": "na",
+  "labeled_at": "2026-10-13T11:39:30",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day1/final_approach_and_pick_20251028_151257.db3",
+   "name": "final_approach_and_pick_20251028_151257.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761689577841750529,
+   "duration_s": 24.035460352,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw"
+   ]
+  }
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day1/final_approach_and_pick_20251028_151551.db3": {
+  "label": "na",
+  "labeled_at": "2026-10-13T11:40:00",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day1/final_approach_and_pick_20251028_151551.db3",
+   "name": "final_approach_and_pick_20251028_151551.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761689752237255851,
+   "duration_s": 29.814025199,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw"
+   ]
+  }
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day1/final_approach_and_pick_20251028_152059.db3": {
+  "label": "na",
+  "labeled_at": "2026-10-13T11:40:20",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day1/final_approach_and_pick_20251028_152059.db3",
+   "name": "final_approach_and_pick_20251028_152059.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761690060762223312,
+   "duration_s": 202.068729752,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw"
+   ]
+  }
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day1/final_approach_and_pick_20251028_152537.db3": {
+  "label": "na",
+  "labeled_at": "2026-10-13T11:40:22",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day1/final_approach_and_pick_20251028_152537.db3",
+   "name": "final_approach_and_pick_20251028_152537.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761690338804715592,
+   "duration_s": 25.518929892,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": []
+  }
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day1/final_approach_and_pick_20251028_152848.db3": {
+  "label": "na",
+  "labeled_at": "2026-10-13T11:40:25",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day1/final_approach_and_pick_20251028_152848.db3",
+   "name": "final_approach_and_pick_20251028_152848.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761690529674938651,
+   "duration_s": 39.652408992,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": []
+  }
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day1/final_approach_and_pick_20251028_153209.db3": {
+  "label": "na",
+  "labeled_at": "2026-10-13T11:40:25",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day1/final_approach_and_pick_20251028_153209.db3",
+   "name": "final_approach_and_pick_20251028_153209.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761690730813934363,
+   "duration_s": 21.254304063,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": []
+  }
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day1/final_approach_and_pick_20251028_153444.db3": {
+  "label": "na",
+  "labeled_at": "2026-10-13T11:40:28",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day1/final_approach_and_pick_20251028_153444.db3",
+   "name": "final_approach_and_pick_20251028_153444.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761690884955796589,
+   "duration_s": 28.806237967,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": []
+  }
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day1/final_approach_and_pick_20251028_154030.db3": {
+  "label": "na",
+  "labeled_at": "2026-10-13T11:40:29",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day1/final_approach_and_pick_20251028_154030.db3",
+   "name": "final_approach_and_pick_20251028_154030.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761691230397359784,
+   "duration_s": 24.046387236,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": []
+  }
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day1/final_approach_and_pick_20251028_154205.db3": {
+  "label": "na",
+  "labeled_at": "2026-10-13T11:40:29",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day1/final_approach_and_pick_20251028_154205.db3",
+   "name": "final_approach_and_pick_20251028_154205.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761691325708960124,
+   "duration_s": 15.386354602,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": []
+  }
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day1/final_approach_and_pick_20251028_154643.db3": {
+  "label": "na",
+  "labeled_at": "2026-10-13T11:40:30",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day1/final_approach_and_pick_20251028_154643.db3",
+   "name": "final_approach_and_pick_20251028_154643.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761691604130847534,
+   "duration_s": 15.480276616,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": []
+  }
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day1/final_approach_and_pick_20251028_155433.db3": {
+  "label": "na",
+  "labeled_at": "2026-10-13T11:40:30",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day1/final_approach_and_pick_20251028_155433.db3",
+   "name": "final_approach_and_pick_20251028_155433.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761692075470597173,
+   "duration_s": 22.641107603,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": []
+  }
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day1/final_approach_and_pick_20251028_155606.db3": {
+  "label": "na",
+  "labeled_at": "2026-10-13T11:40:30",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day1/final_approach_and_pick_20251028_155606.db3",
+   "name": "final_approach_and_pick_20251028_155606.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761692167546867024,
+   "duration_s": 21.074526253,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": []
+  }
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day1/final_approach_and_pick_20251028_160010.db3": {
+  "label": "na",
+  "labeled_at": "2026-10-13T11:40:31",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day1/final_approach_and_pick_20251028_160010.db3",
+   "name": "final_approach_and_pick_20251028_160010.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761692411208220721,
+   "duration_s": 45.281022799,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": []
+  }
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day1/final_approach_and_pick_20251028_160301.db3": {
+  "label": "na",
+  "labeled_at": "2026-10-13T11:40:31",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day1/final_approach_and_pick_20251028_160301.db3",
+   "name": "final_approach_and_pick_20251028_160301.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761692581440386209,
+   "duration_s": 15.741102405,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": []
+  }
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day1/final_approach_and_pick_20251028_160358.db3": {
+  "label": "na",
+  "labeled_at": "2026-10-13T11:40:32",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day1/final_approach_and_pick_20251028_160358.db3",
+   "name": "final_approach_and_pick_20251028_160358.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761692639519084951,
+   "duration_s": 6.079423808,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": []
+  }
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day1/final_approach_and_pick_20251028_160626.db3": {
+  "label": "na",
+  "labeled_at": "2026-10-13T11:40:32",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day1/final_approach_and_pick_20251028_160626.db3",
+   "name": "final_approach_and_pick_20251028_160626.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761692786607976275,
+   "duration_s": 12.299537376,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": []
+  }
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day1/final_approach_and_pick_20251028_160921.db3": {
+  "label": "na",
+  "labeled_at": "2026-10-13T11:40:32",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day1/final_approach_and_pick_20251028_160921.db3",
+   "name": "final_approach_and_pick_20251028_160921.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761692961923218778,
+   "duration_s": 45.201380347,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": []
+  }
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day1/final_approach_and_pick_20251028_161100.db3": {
+  "label": "na",
+  "labeled_at": "2026-10-13T11:40:33",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day1/final_approach_and_pick_20251028_161100.db3",
+   "name": "final_approach_and_pick_20251028_161100.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761693060711096121,
+   "duration_s": 15.280070943,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": []
+  }
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day1/final_approach_and_pick_20251028_161235.db3": {
+  "label": "na",
+  "labeled_at": "2026-10-13T11:40:33",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day1/final_approach_and_pick_20251028_161235.db3",
+   "name": "final_approach_and_pick_20251028_161235.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761693155393293062,
+   "duration_s": 12.95102859,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": []
+  }
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day1/final_approach_and_pick_20251028_161356.db3": {
+  "label": "na",
+  "labeled_at": "2026-10-13T11:40:34",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day1/final_approach_and_pick_20251028_161356.db3",
+   "name": "final_approach_and_pick_20251028_161356.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761693237340535908,
+   "duration_s": 24.363175313,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": []
+  }
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day1/final_approach_and_pick_20251028_162050.db3": {
+  "label": "na",
+  "labeled_at": "2026-10-13T11:40:34",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day1/final_approach_and_pick_20251028_162050.db3",
+   "name": "final_approach_and_pick_20251028_162050.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761693650765514317,
+   "duration_s": 17.052805121,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": []
+  }
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day1/final_approach_and_pick_20251028_162540.db3": {
+  "label": "na",
+  "labeled_at": "2026-10-13T11:40:34",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day1/final_approach_and_pick_20251028_162540.db3",
+   "name": "final_approach_and_pick_20251028_162540.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761693940331987128,
+   "duration_s": 20.630920054,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": []
+  }
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day1/final_approach_and_pick_20251028_162843.db3": {
+  "label": "na",
+  "labeled_at": "2026-10-13T11:40:35",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day1/final_approach_and_pick_20251028_162843.db3",
+   "name": "final_approach_and_pick_20251028_162843.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761694124208005144,
+   "duration_s": 13.76989821,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": []
+  }
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day1/final_approach_and_pick_20251028_163043.db3": {
+  "label": "na",
+  "labeled_at": "2026-10-13T11:40:35",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day1/final_approach_and_pick_20251028_163043.db3",
+   "name": "final_approach_and_pick_20251028_163043.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761694244030364085,
+   "duration_s": 24.930420732,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": []
+  }
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day1/final_approach_and_pick_20251028_163937.db3": {
+  "label": "na",
+  "labeled_at": "2026-10-13T11:40:35",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day1/final_approach_and_pick_20251028_163937.db3",
+   "name": "final_approach_and_pick_20251028_163937.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761694779010947330,
+   "duration_s": 44.346063169,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": []
+  }
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day1/final_approach_and_pick_20251028_164232.db3": {
+  "label": "na",
+  "labeled_at": "2026-10-13T11:40:36",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day1/final_approach_and_pick_20251028_164232.db3",
+   "name": "final_approach_and_pick_20251028_164232.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761694952931855799,
+   "duration_s": 19.213762033,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": []
+  }
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day1/final_approach_and_pick_20251028_164326.db3": {
+  "label": "na",
+  "labeled_at": "2026-10-13T11:40:36",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day1/final_approach_and_pick_20251028_164326.db3",
+   "name": "final_approach_and_pick_20251028_164326.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761695006930938544,
+   "duration_s": 7.138945179,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": []
+  }
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day1/final_approach_and_pick_20251028_164903.db3": {
+  "label": "na",
+  "labeled_at": "2026-10-13T11:40:37",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day1/final_approach_and_pick_20251028_164903.db3",
+   "name": "final_approach_and_pick_20251028_164903.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761695344667533665,
+   "duration_s": 4.25133975,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": []
+  }
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day1/final_approach_and_pick_20251028_165026.db3": {
+  "label": "na",
+  "labeled_at": "2026-10-13T11:40:37",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day1/final_approach_and_pick_20251028_165026.db3",
+   "name": "final_approach_and_pick_20251028_165026.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761695427663335240,
+   "duration_s": 27.239526604,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": []
+  }
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day1/final_approach_and_pick_20251028_170311.db3": {
+  "label": "na",
+  "labeled_at": "2026-10-13T11:40:57",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day1/final_approach_and_pick_20251028_170311.db3",
+   "name": "final_approach_and_pick_20251028_170311.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761696192599785749,
+   "duration_s": 14.367786641,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw"
+   ]
+  }
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day1/final_approach_and_pick_20251028_170708.db3": {
+  "label": "na",
+  "labeled_at": "2026-10-13T11:40:58",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day1/final_approach_and_pick_20251028_170708.db3",
+   "name": "final_approach_and_pick_20251028_170708.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761696428476020484,
+   "duration_s": 45.932069531,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw"
+   ]
+  }
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day1/final_approach_and_pick_20251028_171000.db3": {
+  "label": "pick",
+  "labeled_at": "2026-10-13T11:41:42",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day1/final_approach_and_pick_20251028_171000.db3",
+   "name": "final_approach_and_pick_20251028_171000.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761696600686924187,
+   "duration_s": 14.544362005,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw"
+   ]
+  },
+  "time_ns": 1761696613346838290,
+  "time_s": 12.659914103
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day1/final_approach_and_pick_20251028_171324.db3": {
+  "label": "na",
+  "labeled_at": "2026-10-13T11:41:46",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day1/final_approach_and_pick_20251028_171324.db3",
+   "name": "final_approach_and_pick_20251028_171324.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761696804847204578,
+   "duration_s": 3.278142514,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw"
+   ]
+  }
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day1/final_approach_and_pick_20251028_171431.db3": {
+  "label": "pick",
+  "labeled_at": "2026-10-14T11:06:52",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day1/final_approach_and_pick_20251028_171431.db3",
+   "name": "final_approach_and_pick_20251028_171431.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761696871721631785,
+   "duration_s": 14.626433934,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw"
+   ]
+  },
+  "time_ns": 1761696884978970023,
+  "time_s": 13.257338238
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day2/final_approach_and_pick_20251029_113440.db3": {
+  "label": "na",
+  "labeled_at": "2026-10-14T11:07:02",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day2/final_approach_and_pick_20251029_113440.db3",
+   "name": "final_approach_and_pick_20251029_113440.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761762881544025437,
+   "duration_s": 10.096241918,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw",
+    "/camera/mast_camera/color/image_raw"
+   ]
+  }
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day2/final_approach_and_pick_20251029_113543.db3": {
+  "label": "na",
+  "labeled_at": "2026-10-14T11:07:17",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day2/final_approach_and_pick_20251029_113543.db3",
+   "name": "final_approach_and_pick_20251029_113543.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761762944781192259,
+   "duration_s": 18.44495076,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw",
+    "/camera/mast_camera/color/image_raw"
+   ]
+  }
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day2/final_approach_and_pick_20251029_164443.db3": {
+  "label": "pick",
+  "labeled_at": "2026-10-14T11:07:59",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day2/final_approach_and_pick_20251029_164443.db3",
+   "name": "final_approach_and_pick_20251029_164443.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761781484299634332,
+   "duration_s": 13.859670915,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw",
+    "/camera/mast_camera/color/image_raw"
+   ]
+  },
+  "time_ns": 1761781496412600311,
+  "time_s": 12.112965979
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day2/final_approach_and_pick_20251029_164607.db3": {
+  "label": "na",
+  "labeled_at": "2026-10-14T11:08:07",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day2/final_approach_and_pick_20251029_164607.db3",
+   "name": "final_approach_and_pick_20251029_164607.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761781568351853242,
+   "duration_s": 5.583967745,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw",
+    "/camera/mast_camera/color/image_raw"
+   ]
+  }
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day2/final_approach_and_pick_20251029_164639.db3": {
+  "label": "na",
+  "labeled_at": "2026-10-14T11:08:11",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day2/final_approach_and_pick_20251029_164639.db3",
+   "name": "final_approach_and_pick_20251029_164639.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761781600899930690,
+   "duration_s": 3.689747788,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw",
+    "/camera/mast_camera/color/image_raw"
+   ]
+  }
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day2/final_approach_and_pick_20251029_164729.db3": {
+  "label": "pick",
+  "labeled_at": "2026-10-14T11:08:41",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day2/final_approach_and_pick_20251029_164729.db3",
+   "name": "final_approach_and_pick_20251029_164729.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761781650206795821,
+   "duration_s": 8.509934215,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw",
+    "/camera/mast_camera/color/image_raw"
+   ]
+  },
+  "time_ns": 1761781656864827425,
+  "time_s": 6.658031604
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day2/final_approach_and_pick_20251029_164910.db3": {
+  "label": "na",
+  "labeled_at": "2026-10-14T11:09:26",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day2/final_approach_and_pick_20251029_164910.db3",
+   "name": "final_approach_and_pick_20251029_164910.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761781751049663226,
+   "duration_s": 29.130456372,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw",
+    "/camera/mast_camera/color/image_raw"
+   ]
+  }
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day2/final_approach_and_pick_20251029_165052.db3": {
+  "label": "pick",
+  "labeled_at": "2026-10-14T11:11:31",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day2/final_approach_and_pick_20251029_165052.db3",
+   "name": "final_approach_and_pick_20251029_165052.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761781853004205087,
+   "duration_s": 7.401102047,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw",
+    "/camera/mast_camera/color/image_raw"
+   ]
+  },
+  "time_ns": 1761781858168647820,
+  "time_s": 5.164442733
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day2/final_approach_and_pick_20251029_165334.db3": {
+  "label": "pick",
+  "labeled_at": "2026-10-14T11:12:15",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day2/final_approach_and_pick_20251029_165334.db3",
+   "name": "final_approach_and_pick_20251029_165334.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761782014946488123,
+   "duration_s": 9.382877011,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw",
+    "/camera/mast_camera/color/image_raw"
+   ]
+  },
+  "time_ns": 1761782022040488123,
+  "time_s": 7.094
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day2/final_approach_and_pick_20251029_165449.db3": {
+  "label": "na",
+  "labeled_at": "2026-10-14T11:12:58",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day2/final_approach_and_pick_20251029_165449.db3",
+   "name": "final_approach_and_pick_20251029_165449.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761782091090299933,
+   "duration_s": 28.891617514,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw",
+    "/camera/mast_camera/color/image_raw"
+   ]
+  }
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day2/final_approach_and_pick_20251029_165538.db3": {
+  "label": "na",
+  "labeled_at": "2026-10-14T11:13:23",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day2/final_approach_and_pick_20251029_165538.db3",
+   "name": "final_approach_and_pick_20251029_165538.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761782139244775403,
+   "duration_s": 18.718156314,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw",
+    "/camera/mast_camera/color/image_raw"
+   ]
+  }
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day2/final_approach_and_pick_20251029_165706.db3": {
+  "label": "na",
+  "labeled_at": "2026-10-14T11:13:45",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day2/final_approach_and_pick_20251029_165706.db3",
+   "name": "final_approach_and_pick_20251029_165706.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761782226953776150,
+   "duration_s": 13.610348238,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw",
+    "/camera/mast_camera/color/image_raw"
+   ]
+  }
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day2/final_approach_and_pick_20251029_165816.db3": {
+  "label": "na",
+  "labeled_at": "2026-10-14T11:14:11",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day2/final_approach_and_pick_20251029_165816.db3",
+   "name": "final_approach_and_pick_20251029_165816.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761782296990271060,
+   "duration_s": 14.028543059,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw",
+    "/camera/mast_camera/color/image_raw"
+   ]
+  }
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day2/final_approach_and_pick_20251029_165944.db3": {
+  "label": "na",
+  "labeled_at": "2026-10-14T11:14:21",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day2/final_approach_and_pick_20251029_165944.db3",
+   "name": "final_approach_and_pick_20251029_165944.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761782385498564115,
+   "duration_s": 9.395746979,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw",
+    "/camera/mast_camera/color/image_raw"
+   ]
+  }
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day2/final_approach_and_pick_20251029_170049.db3": {
+  "label": "pick",
+  "labeled_at": "2026-10-14T11:14:59",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day2/final_approach_and_pick_20251029_170049.db3",
+   "name": "final_approach_and_pick_20251029_170049.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761782449755158884,
+   "duration_s": 10.880356779,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw",
+    "/camera/mast_camera/color/image_raw"
+   ]
+  },
+  "time_ns": 1761782458513455518,
+  "time_s": 8.758296634
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day2/final_approach_and_pick_20251029_170153.db3": {
+  "label": "pick",
+  "labeled_at": "2026-10-14T11:15:18",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day2/final_approach_and_pick_20251029_170153.db3",
+   "name": "final_approach_and_pick_20251029_170153.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761782514663816760,
+   "duration_s": 12.445527295,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw",
+    "/camera/mast_camera/color/image_raw"
+   ]
+  },
+  "time_ns": 1761782525095816760,
+  "time_s": 10.432
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day2/final_approach_and_pick_20251029_170313.db3": {
+  "label": "na",
+  "labeled_at": "2026-10-14T11:16:02",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day2/final_approach_and_pick_20251029_170313.db3",
+   "name": "final_approach_and_pick_20251029_170313.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761782594903549281,
+   "duration_s": 22.530926373,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw",
+    "/camera/mast_camera/color/image_raw"
+   ]
+  }
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day2/final_approach_and_pick_20251029_170426.db3": {
+  "label": "na",
+  "labeled_at": "2026-10-14T11:16:10",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day2/final_approach_and_pick_20251029_170426.db3",
+   "name": "final_approach_and_pick_20251029_170426.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761782667458942160,
+   "duration_s": 8.994012053,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw",
+    "/camera/mast_camera/color/image_raw"
+   ]
+  }
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day2/final_approach_and_pick_20251029_170521.db3": {
+  "label": "na",
+  "labeled_at": "2026-10-14T11:16:23",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day2/final_approach_and_pick_20251029_170521.db3",
+   "name": "final_approach_and_pick_20251029_170521.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761782722103991613,
+   "duration_s": 6.850315542,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw",
+    "/camera/mast_camera/color/image_raw"
+   ]
+  }
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day2/final_approach_and_pick_20251029_170659.db3": {
+  "label": "pick",
+  "labeled_at": "2026-10-14T11:17:20",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day2/final_approach_and_pick_20251029_170659.db3",
+   "name": "final_approach_and_pick_20251029_170659.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761782820081716172,
+   "duration_s": 10.480955741,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw",
+    "/camera/mast_camera/color/image_raw"
+   ]
+  },
+  "time_ns": 1761782828335151035,
+  "time_s": 8.253434863
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day2/final_approach_and_pick_20251029_170813.db3": {
+  "label": "pick",
+  "labeled_at": "2026-10-14T11:17:47",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day2/final_approach_and_pick_20251029_170813.db3",
+   "name": "final_approach_and_pick_20251029_170813.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761782894080416533,
+   "duration_s": 15.639192974,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw",
+    "/camera/mast_camera/color/image_raw"
+   ]
+  },
+  "time_ns": 1761782907592286096,
+  "time_s": 13.511869563
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day2/final_approach_and_pick_20251029_171008.db3": {
+  "label": "na",
+  "labeled_at": "2026-10-14T11:17:54",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day2/final_approach_and_pick_20251029_171008.db3",
+   "name": "final_approach_and_pick_20251029_171008.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761783009155686998,
+   "duration_s": 5.973685637,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw",
+    "/camera/mast_camera/color/image_raw"
+   ]
+  }
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day2/final_approach_and_pick_20251029_171032.db3": {
+  "label": "na",
+  "labeled_at": "2026-10-14T11:18:20",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day2/final_approach_and_pick_20251029_171032.db3",
+   "name": "final_approach_and_pick_20251029_171032.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761783033067138734,
+   "duration_s": 13.273171678,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw",
+    "/camera/mast_camera/color/image_raw"
+   ]
+  }
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day2/final_approach_and_pick_20251029_171227.db3": {
+  "label": "na",
+  "labeled_at": "2026-10-14T11:20:58",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day2/final_approach_and_pick_20251029_171227.db3",
+   "name": "final_approach_and_pick_20251029_171227.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761783148257442375,
+   "duration_s": 44.782676529,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw",
+    "/camera/mast_camera/color/image_raw"
+   ]
+  }
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day2/final_approach_and_pick_20251029_171337.db3": {
+  "label": "na",
+  "labeled_at": "2026-10-14T11:21:18",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day2/final_approach_and_pick_20251029_171337.db3",
+   "name": "final_approach_and_pick_20251029_171337.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761783218283970446,
+   "duration_s": 11.713443946,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw",
+    "/camera/mast_camera/color/image_raw"
+   ]
+  }
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day2/final_approach_and_pick_20251029_171431.db3": {
+  "label": "pick",
+  "labeled_at": "2026-10-14T11:21:40",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day2/final_approach_and_pick_20251029_171431.db3",
+   "name": "final_approach_and_pick_20251029_171431.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761783272140261801,
+   "duration_s": 9.398674515,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw",
+    "/camera/mast_camera/color/image_raw"
+   ]
+  },
+  "time_ns": 1761783279783452512,
+  "time_s": 7.643190711
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day2/final_approach_and_pick_20251029_171544.db3": {
+  "label": "na",
+  "labeled_at": "2026-10-14T11:21:48",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day2/final_approach_and_pick_20251029_171544.db3",
+   "name": "final_approach_and_pick_20251029_171544.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761783344700013007,
+   "duration_s": 4.940039856,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw",
+    "/camera/mast_camera/color/image_raw"
+   ]
+  }
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day2/final_approach_and_pick_20251029_171606.db3": {
+  "label": "na",
+  "labeled_at": "2026-10-14T11:23:13",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day2/final_approach_and_pick_20251029_171606.db3",
+   "name": "final_approach_and_pick_20251029_171606.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761783367865768411,
+   "duration_s": 44.385388993,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw",
+    "/camera/mast_camera/color/image_raw"
+   ]
+  }
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day2/final_approach_and_pick_20251029_171723.db3": {
+  "label": "na",
+  "labeled_at": "2026-10-14T11:23:21",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day2/final_approach_and_pick_20251029_171723.db3",
+   "name": "final_approach_and_pick_20251029_171723.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761783443910445870,
+   "duration_s": 3.919831691,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw",
+    "/camera/mast_camera/color/image_raw"
+   ]
+  }
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day2/final_approach_and_pick_20251029_171756.db3": {
+  "label": "pick",
+  "labeled_at": "2026-10-14T11:24:09",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day2/final_approach_and_pick_20251029_171756.db3",
+   "name": "final_approach_and_pick_20251029_171756.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761783476858547806,
+   "duration_s": 16.812707336,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw",
+    "/camera/mast_camera/color/image_raw"
+   ]
+  },
+  "time_ns": 1761783491743547806,
+  "time_s": 14.885
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day2/final_approach_and_pick_20251029_171859.db3": {
+  "label": "na",
+  "labeled_at": "2026-10-14T11:24:20",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day2/final_approach_and_pick_20251029_171859.db3",
+   "name": "final_approach_and_pick_20251029_171859.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761783540621739776,
+   "duration_s": 8.404847371,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw",
+    "/camera/mast_camera/color/image_raw"
+   ]
+  }
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day2/final_approach_and_pick_20251029_171959.db3": {
+  "label": "pick",
+  "labeled_at": "2026-10-14T11:24:58",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day2/final_approach_and_pick_20251029_171959.db3",
+   "name": "final_approach_and_pick_20251029_171959.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761783601568232600,
+   "duration_s": 16.469779842,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw",
+    "/camera/mast_camera/color/image_raw"
+   ]
+  },
+  "time_ns": 1761783616327909691,
+  "time_s": 14.759677091
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day2/final_approach_and_pick_20251029_172159.db3": {
+  "label": "na",
+  "labeled_at": "2026-10-14T11:25:08",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day2/final_approach_and_pick_20251029_172159.db3",
+   "name": "final_approach_and_pick_20251029_172159.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761783719951500423,
+   "duration_s": 10.48402955,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw",
+    "/camera/mast_camera/color/image_raw"
+   ]
+  }
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day2/final_approach_and_pick_20251029_172251.db3": {
+  "label": "pick",
+  "labeled_at": "2026-10-14T11:26:09",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day2/final_approach_and_pick_20251029_172251.db3",
+   "name": "final_approach_and_pick_20251029_172251.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761783772056659833,
+   "duration_s": 20.990949225,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw",
+    "/camera/mast_camera/color/image_raw"
+   ]
+  },
+  "time_ns": 1761783792145893036,
+  "time_s": 20.089233203
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day2/final_approach_and_pick_20251029_172414.db3": {
+  "label": "na",
+  "labeled_at": "2026-10-14T11:26:22",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day2/final_approach_and_pick_20251029_172414.db3",
+   "name": "final_approach_and_pick_20251029_172414.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761783855571048847,
+   "duration_s": 12.479825117,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw",
+    "/camera/mast_camera/color/image_raw"
+   ]
+  }
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day2/final_approach_and_pick_20251029_172537.db3": {
+  "label": "na",
+  "labeled_at": "2026-10-14T11:26:29",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day2/final_approach_and_pick_20251029_172537.db3",
+   "name": "final_approach_and_pick_20251029_172537.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761783938697892581,
+   "duration_s": 4.038740966,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw",
+    "/camera/mast_camera/color/image_raw"
+   ]
+  }
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day2/final_approach_and_pick_20251029_172603.db3": {
+  "label": "na",
+  "labeled_at": "2026-10-14T11:26:33",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day2/final_approach_and_pick_20251029_172603.db3",
+   "name": "final_approach_and_pick_20251029_172603.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761783964258807329,
+   "duration_s": 3.826017842,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw",
+    "/camera/mast_camera/color/image_raw"
+   ]
+  }
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day2/final_approach_and_pick_20251029_172622.db3": {
+  "label": "pick",
+  "labeled_at": "2026-10-14T11:28:05",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day2/final_approach_and_pick_20251029_172622.db3",
+   "name": "final_approach_and_pick_20251029_172622.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761783983072532186,
+   "duration_s": 21.059761997,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw",
+    "/camera/mast_camera/color/image_raw"
+   ]
+  },
+  "time_ns": 1761784001421532186,
+  "time_s": 18.349
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day2/final_approach_and_pick_20251029_172728.db3": {
+  "label": "slip",
+  "labeled_at": "2026-10-14T11:28:34",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day2/final_approach_and_pick_20251029_172728.db3",
+   "name": "final_approach_and_pick_20251029_172728.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761784049299938923,
+   "duration_s": 21.160231496,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw",
+    "/camera/mast_camera/color/image_raw"
+   ]
+  },
+  "time_ns": 1761784069108980683,
+  "time_s": 19.80904176
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day2/final_approach_and_pick_20251029_172850.db3": {
+  "label": "na",
+  "labeled_at": "2026-10-14T11:28:41",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day2/final_approach_and_pick_20251029_172850.db3",
+   "name": "final_approach_and_pick_20251029_172850.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761784131585873387,
+   "duration_s": 3.341286889,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw",
+    "/camera/mast_camera/color/image_raw"
+   ]
+  }
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day2/final_approach_and_pick_20251029_172946.db3": {
+  "label": "slip",
+  "labeled_at": "2026-10-14T11:29:21",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day2/final_approach_and_pick_20251029_172946.db3",
+   "name": "final_approach_and_pick_20251029_172946.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761784186966742609,
+   "duration_s": 14.498261998,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw",
+    "/camera/mast_camera/color/image_raw"
+   ]
+  },
+  "time_ns": 1761784200364009195,
+  "time_s": 13.397266586
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day2/final_approach_and_pick_20251029_173309.db3": {
+  "label": "na",
+  "labeled_at": "2026-10-14T11:29:30",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day2/final_approach_and_pick_20251029_173309.db3",
+   "name": "final_approach_and_pick_20251029_173309.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761784390246980656,
+   "duration_s": 6.657520933,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw",
+    "/camera/mast_camera/color/image_raw"
+   ]
+  }
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day2/final_approach_and_pick_20251029_173341.db3": {
+  "label": "na",
+  "labeled_at": "2026-10-14T11:30:17",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day2/final_approach_and_pick_20251029_173341.db3",
+   "name": "final_approach_and_pick_20251029_173341.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761784422365458594,
+   "duration_s": 23.143250533,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw",
+    "/camera/mast_camera/color/image_raw"
+   ]
+  }
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day2/final_approach_and_pick_20251029_173433.db3": {
+  "label": "pick",
+  "labeled_at": "2026-10-14T11:30:53",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day2/final_approach_and_pick_20251029_173433.db3",
+   "name": "final_approach_and_pick_20251029_173433.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761784473916249724,
+   "duration_s": 11.363378408,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw",
+    "/camera/mast_camera/color/image_raw"
+   ]
+  },
+  "time_ns": 1761784483283249724,
+  "time_s": 9.367
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day2/final_approach_and_pick_20251029_173557.db3": {
+  "label": "pick",
+  "labeled_at": "2026-10-14T11:31:43",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day2/final_approach_and_pick_20251029_173557.db3",
+   "name": "final_approach_and_pick_20251029_173557.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761784558160107808,
+   "duration_s": 22.902845962,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw",
+    "/camera/mast_camera/color/image_raw"
+   ]
+  },
+  "time_ns": 1761784578931107808,
+  "time_s": 20.771
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day2/final_approach_and_pick_20251029_173708.db3": {
+  "label": "na",
+  "labeled_at": "2026-10-14T11:31:48",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day2/final_approach_and_pick_20251029_173708.db3",
+   "name": "final_approach_and_pick_20251029_173708.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761784629351959341,
+   "duration_s": 4.428848892,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw",
+    "/camera/mast_camera/color/image_raw"
+   ]
+  }
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day2/final_approach_and_pick_20251029_173742.db3": {
+  "label": "pick",
+  "labeled_at": "2026-10-14T11:32:11",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day2/final_approach_and_pick_20251029_173742.db3",
+   "name": "final_approach_and_pick_20251029_173742.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761784663194973340,
+   "duration_s": 8.008348326,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw",
+    "/camera/mast_camera/color/image_raw"
+   ]
+  },
+  "time_ns": 1761784669031346817,
+  "time_s": 5.836373477
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day2/final_approach_and_pick_20251029_173844.db3": {
+  "label": "na",
+  "labeled_at": "2026-10-14T11:32:17",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day2/final_approach_and_pick_20251029_173844.db3",
+   "name": "final_approach_and_pick_20251029_173844.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761784724721784010,
+   "duration_s": 6.184311964,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw",
+    "/camera/mast_camera/color/image_raw"
+   ]
+  }
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day2/final_approach_and_pick_20251029_173938.db3": {
+  "label": "slip",
+  "labeled_at": "2026-10-14T11:33:27",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day2/final_approach_and_pick_20251029_173938.db3",
+   "name": "final_approach_and_pick_20251029_173938.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761784779141263922,
+   "duration_s": 18.383060861,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw",
+    "/camera/mast_camera/color/image_raw"
+   ]
+  },
+  "time_ns": 1761784795398040253,
+  "time_s": 16.256776331
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day2/final_approach_and_pick_20251029_174053.db3": {
+  "label": "na",
+  "labeled_at": "2026-10-14T11:34:37",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day2/final_approach_and_pick_20251029_174053.db3",
+   "name": "final_approach_and_pick_20251029_174053.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761784854679857549,
+   "duration_s": 44.736116143,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw",
+    "/camera/mast_camera/color/image_raw"
+   ]
+  }
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day2/final_approach_and_pick_20251029_174220.db3": {
+  "label": "na",
+  "labeled_at": "2026-10-14T11:34:45",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day2/final_approach_and_pick_20251029_174220.db3",
+   "name": "final_approach_and_pick_20251029_174220.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761784941539884884,
+   "duration_s": 8.794489638,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw",
+    "/camera/mast_camera/color/image_raw"
+   ]
+  }
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day2/final_approach_and_pick_20251029_174404.db3": {
+  "label": "slip",
+  "labeled_at": "2026-10-14T11:35:01",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day2/final_approach_and_pick_20251029_174404.db3",
+   "name": "final_approach_and_pick_20251029_174404.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761785045092570238,
+   "duration_s": 6.820050983,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw",
+    "/camera/mast_camera/color/image_raw"
+   ]
+  },
+  "time_ns": 1761785049538570238,
+  "time_s": 4.446
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day2/final_approach_and_pick_20251029_174510.db3": {
+  "label": "na",
+  "labeled_at": "2026-10-14T11:36:40",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day2/final_approach_and_pick_20251029_174510.db3",
+   "name": "final_approach_and_pick_20251029_174510.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761785111053464799,
+   "duration_s": 44.687700119,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw",
+    "/camera/mast_camera/color/image_raw"
+   ]
+  }
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day2/final_approach_and_pick_20251029_174813.db3": {
+  "label": "pick",
+  "labeled_at": "2026-10-14T11:37:06",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day2/final_approach_and_pick_20251029_174813.db3",
+   "name": "final_approach_and_pick_20251029_174813.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761785294529727757,
+   "duration_s": 14.534087091,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw",
+    "/camera/mast_camera/color/image_raw"
+   ]
+  },
+  "time_ns": 1761785307107653792,
+  "time_s": 12.577926035
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day2/final_approach_and_pick_20251029_174943.db3": {
+  "label": "pick",
+  "labeled_at": "2026-10-14T11:37:24",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day2/final_approach_and_pick_20251029_174943.db3",
+   "name": "final_approach_and_pick_20251029_174943.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761785384309183500,
+   "duration_s": 9.035831156,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw",
+    "/camera/mast_camera/color/image_raw"
+   ]
+  },
+  "time_ns": 1761785391486686902,
+  "time_s": 7.177503402
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day2/final_approach_and_pick_20251029_175049.db3": {
+  "label": "na",
+  "labeled_at": "2026-10-14T11:38:44",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day2/final_approach_and_pick_20251029_175049.db3",
+   "name": "final_approach_and_pick_20251029_175049.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761785449884099767,
+   "duration_s": 45.031891851,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw",
+    "/camera/mast_camera/color/image_raw"
+   ]
+  }
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day2/final_approach_and_pick_20251029_175156.db3": {
+  "label": "pick",
+  "labeled_at": "2026-10-14T11:39:21",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day2/final_approach_and_pick_20251029_175156.db3",
+   "name": "final_approach_and_pick_20251029_175156.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761785518731957244,
+   "duration_s": 14.152261034,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw",
+    "/camera/mast_camera/color/image_raw"
+   ]
+  },
+  "time_ns": 1761785530958806486,
+  "time_s": 12.226849242
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day2/final_approach_and_pick_20251029_175331.db3": {
+  "label": "na",
+  "labeled_at": "2026-10-14T11:41:23",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day2/final_approach_and_pick_20251029_175331.db3",
+   "name": "final_approach_and_pick_20251029_175331.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761785612060833391,
+   "duration_s": 19.45092863,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw",
+    "/camera/mast_camera/color/image_raw"
+   ]
+  }
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day2/final_approach_and_pick_20251029_175542.db3": {
+  "label": "pick",
+  "labeled_at": "2026-10-14T11:41:50",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day2/final_approach_and_pick_20251029_175542.db3",
+   "name": "final_approach_and_pick_20251029_175542.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761785743844216265,
+   "duration_s": 7.016738337,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw",
+    "/camera/mast_camera/color/image_raw"
+   ]
+  },
+  "time_ns": 1761785749083216265,
+  "time_s": 5.239
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day2/final_approach_and_pick_20251029_175730.db3": {
+  "label": "pick",
+  "labeled_at": "2026-10-14T11:42:08",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day2/final_approach_and_pick_20251029_175730.db3",
+   "name": "final_approach_and_pick_20251029_175730.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761785851236902496,
+   "duration_s": 16.474962582,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw",
+    "/camera/mast_camera/color/image_raw"
+   ]
+  },
+  "time_ns": 1761785866018902496,
+  "time_s": 14.782
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day2/final_approach_and_pick_20251029_180039.db3": {
+  "label": "na",
+  "labeled_at": "2026-10-14T11:43:18",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day2/final_approach_and_pick_20251029_180039.db3",
+   "name": "final_approach_and_pick_20251029_180039.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761786040153683417,
+   "duration_s": 44.534245556,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw",
+    "/camera/mast_camera/color/image_raw"
+   ]
+  }
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day2/final_approach_and_pick_20251029_180211.db3": {
+  "label": "na",
+  "labeled_at": "2026-10-14T11:43:23",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day2/final_approach_and_pick_20251029_180211.db3",
+   "name": "final_approach_and_pick_20251029_180211.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761786132567229379,
+   "duration_s": 3.632270824,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw",
+    "/camera/mast_camera/color/image_raw"
+   ]
+  }
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day2/final_approach_and_pick_20251029_180245.db3": {
+  "label": "slip",
+  "labeled_at": "2026-10-14T11:44:08",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day2/final_approach_and_pick_20251029_180245.db3",
+   "name": "final_approach_and_pick_20251029_180245.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761786166033566727,
+   "duration_s": 20.286852183,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw",
+    "/camera/mast_camera/color/image_raw"
+   ]
+  },
+  "time_ns": 1761786184579566727,
+  "time_s": 18.546
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day2/final_approach_and_pick_20251029_180355.db3": {
+  "label": "pick",
+  "labeled_at": "2026-10-14T11:44:26",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day2/final_approach_and_pick_20251029_180355.db3",
+   "name": "final_approach_and_pick_20251029_180355.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761786235857582113,
+   "duration_s": 7.891228667,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw",
+    "/camera/mast_camera/color/image_raw"
+   ]
+  },
+  "time_ns": 1761786241648674518,
+  "time_s": 5.791092405
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day2/final_approach_and_pick_20251029_180549.db3": {
+  "label": "pick",
+  "labeled_at": "2026-10-14T11:44:38",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day2/final_approach_and_pick_20251029_180549.db3",
+   "name": "final_approach_and_pick_20251029_180549.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761786350550054512,
+   "duration_s": 10.462949442,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw",
+    "/camera/mast_camera/color/image_raw"
+   ]
+  },
+  "time_ns": 1761786359496054512,
+  "time_s": 8.946
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day2/final_approach_and_pick_20251029_180705.db3": {
+  "label": "na",
+  "labeled_at": "2026-10-14T11:44:45",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day2/final_approach_and_pick_20251029_180705.db3",
+   "name": "final_approach_and_pick_20251029_180705.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761786426214900190,
+   "duration_s": 6.122486327,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw",
+    "/camera/mast_camera/color/image_raw"
+   ]
+  }
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day2/final_approach_and_pick_20251029_180739.db3": {
+  "label": "na",
+  "labeled_at": "2026-10-14T11:45:05",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day2/final_approach_and_pick_20251029_180739.db3",
+   "name": "final_approach_and_pick_20251029_180739.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761786460156814277,
+   "duration_s": 7.452801752,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw",
+    "/camera/mast_camera/color/image_raw"
+   ]
+  }
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day2/final_approach_and_pick_20251029_180834.db3": {
+  "label": "na",
+  "labeled_at": "2026-10-14T11:45:32",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day2/final_approach_and_pick_20251029_180834.db3",
+   "name": "final_approach_and_pick_20251029_180834.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761786516048741060,
+   "duration_s": 13.846154993,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw",
+    "/camera/mast_camera/color/image_raw"
+   ]
+  }
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_113549.db3": {
+  "label": "na",
+  "labeled_at": "2026-10-14T11:45:49",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_113549.db3",
+   "name": "final_approach_and_pick_20251030_113549.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761849350279836259,
+   "duration_s": 14.253797904,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw",
+    "/camera/mast_camera/color/image_raw"
+   ]
+  }
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_113754.db3": {
+  "label": "na",
+  "labeled_at": "2026-10-14T11:45:55",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_113754.db3",
+   "name": "final_approach_and_pick_20251030_113754.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761849474969676822,
+   "duration_s": 6.388904851,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw",
+    "/camera/mast_camera/color/image_raw"
+   ]
+  }
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_113834.db3": {
+  "label": "na",
+  "labeled_at": "2026-10-14T11:48:32",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_113834.db3",
+   "name": "final_approach_and_pick_20251030_113834.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761849515128132630,
+   "duration_s": 45.093569764,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw",
+    "/camera/mast_camera/color/image_raw"
+   ]
+  }
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_114052.db3": {
+  "label": "na",
+  "labeled_at": "2026-10-14T11:48:45",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_114052.db3",
+   "name": "final_approach_and_pick_20251030_114052.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761849653327073478,
+   "duration_s": 18.261754609,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw",
+    "/camera/mast_camera/color/image_raw"
+   ]
+  }
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_114202.db3": {
+  "label": "na",
+  "labeled_at": "2026-10-14T11:49:22",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_114202.db3",
+   "name": "final_approach_and_pick_20251030_114202.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761849723166260153,
+   "duration_s": 23.476379782,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw",
+    "/camera/mast_camera/color/image_raw"
+   ]
+  }
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_114253.db3": {
+  "label": "na",
+  "labeled_at": "2026-10-14T11:50:49",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_114253.db3",
+   "name": "final_approach_and_pick_20251030_114253.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761849773956957840,
+   "duration_s": 44.727256429,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw",
+    "/camera/mast_camera/color/image_raw"
+   ]
+  }
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_114539.db3": {
+  "label": "slip",
+  "labeled_at": "2026-10-14T11:51:30",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_114539.db3",
+   "name": "final_approach_and_pick_20251030_114539.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761849940233879022,
+   "duration_s": 14.756440842,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw",
+    "/camera/mast_camera/color/image_raw"
+   ]
+  },
+  "time_ns": 1761849952765879022,
+  "time_s": 12.532
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_114927.db3": {
+  "label": "slip",
+  "labeled_at": "2026-10-14T11:52:09",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_114927.db3",
+   "name": "final_approach_and_pick_20251030_114927.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761850168049654181,
+   "duration_s": 18.181999782,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw",
+    "/camera/mast_camera/color/image_raw"
+   ]
+  },
+  "time_ns": 1761850184136358519,
+  "time_s": 16.086704338
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_115037.db3": {
+  "label": "na",
+  "labeled_at": "2026-10-14T11:52:29",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_115037.db3",
+   "name": "final_approach_and_pick_20251030_115037.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761850238175083857,
+   "duration_s": 24.26620295,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw",
+    "/camera/mast_camera/color/image_raw"
+   ]
+  }
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_115154.db3": {
+  "label": "na",
+  "labeled_at": "2026-10-14T11:52:34",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_115154.db3",
+   "name": "final_approach_and_pick_20251030_115154.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761850315186279072,
+   "duration_s": 5.322511863,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw",
+    "/camera/mast_camera/color/image_raw"
+   ]
+  }
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_115312.db3": {
+  "label": "pick",
+  "labeled_at": "2026-10-14T11:53:54",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_115312.db3",
+   "name": "final_approach_and_pick_20251030_115312.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761850393242791387,
+   "duration_s": 8.396418074,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw",
+    "/camera/mast_camera/color/image_raw"
+   ]
+  },
+  "time_ns": 1761850399446410703,
+  "time_s": 6.203619316
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_115453.db3": {
+  "label": "na",
+  "labeled_at": "2026-10-14T11:54:05",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_115453.db3",
+   "name": "final_approach_and_pick_20251030_115453.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761850494362130762,
+   "duration_s": 12.161816754,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw",
+    "/camera/mast_camera/color/image_raw"
+   ]
+  }
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_115718.db3": {
+  "label": "na",
+  "labeled_at": "2026-10-14T11:54:20",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_115718.db3",
+   "name": "final_approach_and_pick_20251030_115718.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761850639376799252,
+   "duration_s": 9.843790882,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw",
+    "/camera/mast_camera/color/image_raw"
+   ]
+  }
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_115954.db3": {
+  "label": "na",
+  "labeled_at": "2026-10-14T11:54:35",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_115954.db3",
+   "name": "final_approach_and_pick_20251030_115954.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761850795270250550,
+   "duration_s": 8.921906098,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw",
+    "/camera/mast_camera/color/image_raw"
+   ]
+  }
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_130354.db3": {
+  "label": "pick",
+  "labeled_at": "2026-10-14T11:55:07",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_130354.db3",
+   "name": "final_approach_and_pick_20251030_130354.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761854636171314274,
+   "duration_s": 10.757217762,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw",
+    "/camera/mast_camera/color/image_raw"
+   ]
+  },
+  "time_ns": 1761854644644476310,
+  "time_s": 8.473162036
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_130515.db3": {
+  "label": "na",
+  "labeled_at": "2026-10-14T11:55:26",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_130515.db3",
+   "name": "final_approach_and_pick_20251030_130515.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761854715611622663,
+   "duration_s": 13.920804361,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw",
+    "/camera/mast_camera/color/image_raw"
+   ]
+  }
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_130656.db3": {
+  "label": "pick",
+  "labeled_at": "2026-10-14T11:55:45",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_130656.db3",
+   "name": "final_approach_and_pick_20251030_130656.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761854817265852901,
+   "duration_s": 5.891651108,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw",
+    "/camera/mast_camera/color/image_raw"
+   ]
+  },
+  "time_ns": 1761854821473852901,
+  "time_s": 4.208
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_130808.db3": {
+  "label": "pick",
+  "labeled_at": "2026-10-14T11:56:04",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_130808.db3",
+   "name": "final_approach_and_pick_20251030_130808.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761854889790901294,
+   "duration_s": 10.590042535,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw",
+    "/camera/mast_camera/color/image_raw"
+   ]
+  },
+  "time_ns": 1761854898786924534,
+  "time_s": 8.99602324
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_130932.db3": {
+  "label": "pick",
+  "labeled_at": "2026-10-14T11:56:29",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_130932.db3",
+   "name": "final_approach_and_pick_20251030_130932.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761854973078916677,
+   "duration_s": 9.725482887,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw",
+    "/camera/mast_camera/color/image_raw"
+   ]
+  },
+  "time_ns": 1761854981846806150,
+  "time_s": 8.767889473
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_131112.db3": {
+  "label": "pick",
+  "labeled_at": "2026-10-14T11:56:45",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_131112.db3",
+   "name": "final_approach_and_pick_20251030_131112.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761855072800289561,
+   "duration_s": 11.002839862,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw",
+    "/camera/mast_camera/color/image_raw"
+   ]
+  },
+  "time_ns": 1761855082032244412,
+  "time_s": 9.231954851
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_131346.db3": {
+  "label": "na",
+  "labeled_at": "2026-10-14T11:57:03",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_131346.db3",
+   "name": "final_approach_and_pick_20251030_131346.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761855226903792469,
+   "duration_s": 12.844837016,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw",
+    "/camera/mast_camera/color/image_raw"
+   ]
+  }
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_131440.db3": {
+  "label": "pick",
+  "labeled_at": "2026-10-14T11:57:53",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_131440.db3",
+   "name": "final_approach_and_pick_20251030_131440.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761855282475050386,
+   "duration_s": 8.621838287,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw",
+    "/camera/mast_camera/color/image_raw"
+   ]
+  },
+  "time_ns": 1761855289122458966,
+  "time_s": 6.64740858
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_131608.db3": {
+  "label": "na",
+  "labeled_at": "2026-10-14T11:58:00",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_131608.db3",
+   "name": "final_approach_and_pick_20251030_131608.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761855368608070921,
+   "duration_s": 6.880807074,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw",
+    "/camera/mast_camera/color/image_raw"
+   ]
+  }
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_131630.db3": {
+  "label": "na",
+  "labeled_at": "2026-10-14T11:58:06",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_131630.db3",
+   "name": "final_approach_and_pick_20251030_131630.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761855391797653294,
+   "duration_s": 4.941835935,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw",
+    "/camera/mast_camera/color/image_raw"
+   ]
+  }
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_131700.db3": {
+  "label": "pick",
+  "labeled_at": "2026-10-14T11:58:52",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_131700.db3",
+   "name": "final_approach_and_pick_20251030_131700.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761855421040247400,
+   "duration_s": 11.398557749,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw",
+    "/camera/mast_camera/color/image_raw"
+   ]
+  },
+  "time_ns": 1761855430393799489,
+  "time_s": 9.353552089
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_131808.db3": {
+  "label": "pick",
+  "labeled_at": "2026-10-14T11:59:15",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_131808.db3",
+   "name": "final_approach_and_pick_20251030_131808.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761855489648470092,
+   "duration_s": 13.608669414,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw",
+    "/camera/mast_camera/color/image_raw"
+   ]
+  },
+  "time_ns": 1761855501508186084,
+  "time_s": 11.859715992
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_131923.db3": {
+  "label": "na",
+  "labeled_at": "2026-10-14T11:59:31",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_131923.db3",
+   "name": "final_approach_and_pick_20251030_131923.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761855563695451875,
+   "duration_s": 16.183339094,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw",
+    "/camera/mast_camera/color/image_raw"
+   ]
+  }
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_132041.db3": {
+  "label": "na",
+  "labeled_at": "2026-10-14T12:00:01",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_132041.db3",
+   "name": "final_approach_and_pick_20251030_132041.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761855641676704296,
+   "duration_s": 16.897469499,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw",
+    "/camera/mast_camera/color/image_raw"
+   ]
+  }
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_132141.db3": {
+  "label": "pick",
+  "labeled_at": "2026-10-14T12:01:58",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_132141.db3",
+   "name": "final_approach_and_pick_20251030_132141.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761855702270031348,
+   "duration_s": 39.081742969,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw",
+    "/camera/mast_camera/color/image_raw"
+   ]
+  },
+  "time_ns": 1761855720219428185,
+  "time_s": 17.949396837
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_132329.db3": {
+  "label": "pick",
+  "labeled_at": "2026-10-14T12:02:39",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_132329.db3",
+   "name": "final_approach_and_pick_20251030_132329.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761855810134098698,
+   "duration_s": 12.59969561,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw",
+    "/camera/mast_camera/color/image_raw"
+   ]
+  },
+  "time_ns": 1761855820466147462,
+  "time_s": 10.332048764
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_132429.db3": {
+  "label": "slip",
+  "labeled_at": "2026-10-14T12:03:08",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_132429.db3",
+   "name": "final_approach_and_pick_20251030_132429.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761855870042548903,
+   "duration_s": 13.182095176,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw",
+    "/camera/mast_camera/color/image_raw"
+   ]
+  },
+  "time_ns": 1761855882970742197,
+  "time_s": 12.928193294
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_132634.db3": {
+  "label": "na",
+  "labeled_at": "2026-10-14T12:03:18",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_132634.db3",
+   "name": "final_approach_and_pick_20251030_132634.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761855994935399998,
+   "duration_s": 9.611519961,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw",
+    "/camera/mast_camera/color/image_raw"
+   ]
+  }
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_132747.db3": {
+  "label": "pick",
+  "labeled_at": "2026-10-14T12:04:09",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_132747.db3",
+   "name": "final_approach_and_pick_20251030_132747.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761856068218239030,
+   "duration_s": 9.856608969,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw",
+    "/camera/mast_camera/color/image_raw"
+   ]
+  },
+  "time_ns": 1761856076226239030,
+  "time_s": 8.008
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_132850.db3": {
+  "label": "pick",
+  "labeled_at": "2026-10-14T12:04:31",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_132850.db3",
+   "name": "final_approach_and_pick_20251030_132850.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761856131095027749,
+   "duration_s": 11.165340801,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw",
+    "/camera/mast_camera/color/image_raw"
+   ]
+  },
+  "time_ns": 1761856140868520627,
+  "time_s": 9.773492878
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_133135.db3": {
+  "label": "pick",
+  "labeled_at": "2026-10-14T12:04:46",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_133135.db3",
+   "name": "final_approach_and_pick_20251030_133135.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761856295676613003,
+   "duration_s": 7.398585068,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw",
+    "/camera/mast_camera/color/image_raw"
+   ]
+  },
+  "time_ns": 1761856300889484945,
+  "time_s": 5.212871942
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_133243.db3": {
+  "label": "pick",
+  "labeled_at": "2026-10-14T12:05:19",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_133243.db3",
+   "name": "final_approach_and_pick_20251030_133243.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761856364390630634,
+   "duration_s": 12.39367375,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw",
+    "/camera/mast_camera/color/image_raw"
+   ]
+  },
+  "time_ns": 1761856375881629755,
+  "time_s": 11.490999121
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_133343.db3": {
+  "label": "na",
+  "labeled_at": "2026-10-14T12:05:30",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_133343.db3",
+   "name": "final_approach_and_pick_20251030_133343.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761856424389436391,
+   "duration_s": 12.48102302,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw",
+    "/camera/mast_camera/color/image_raw"
+   ]
+  }
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_133504.db3": {
+  "label": "pick",
+  "labeled_at": "2026-10-14T12:06:48",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_133504.db3",
+   "name": "final_approach_and_pick_20251030_133504.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761856504975470924,
+   "duration_s": 14.652527833,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw",
+    "/camera/mast_camera/color/image_raw"
+   ]
+  },
+  "time_ns": 1761856517586502590,
+  "time_s": 12.611031666
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_133640.db3": {
+  "label": "pick",
+  "labeled_at": "2026-10-14T12:07:05",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_133640.db3",
+   "name": "final_approach_and_pick_20251030_133640.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761856601465863475,
+   "duration_s": 8.623375437,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw",
+    "/camera/mast_camera/color/image_raw"
+   ]
+  },
+  "time_ns": 1761856607988310367,
+  "time_s": 6.522446892
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_133814.db3": {
+  "label": "pick",
+  "labeled_at": "2026-10-14T12:08:08",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_133814.db3",
+   "name": "final_approach_and_pick_20251030_133814.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761856695010053118,
+   "duration_s": 8.018797495,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw",
+    "/camera/mast_camera/color/image_raw"
+   ]
+  },
+  "time_ns": 1761856701581996205,
+  "time_s": 6.571943087
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_134038.db3": {
+  "label": "pick",
+  "labeled_at": "2026-10-14T12:09:21",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_134038.db3",
+   "name": "final_approach_and_pick_20251030_134038.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761856839367599188,
+   "duration_s": 17.448552089,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw",
+    "/camera/mast_camera/color/image_raw"
+   ]
+  },
+  "time_ns": 1761856854865440391,
+  "time_s": 15.497841203
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_134222.db3": {
+  "label": "na",
+  "labeled_at": "2026-10-14T12:09:32",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_134222.db3",
+   "name": "final_approach_and_pick_20251030_134222.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761856943914950629,
+   "duration_s": 6.231685918,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw",
+    "/camera/mast_camera/color/image_raw"
+   ]
+  }
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_134315.db3": {
+  "label": "na",
+  "labeled_at": "2026-10-14T12:09:40",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_134315.db3",
+   "name": "final_approach_and_pick_20251030_134315.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761856995619007291,
+   "duration_s": 4.366611467,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw",
+    "/camera/mast_camera/color/image_raw"
+   ]
+  }
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_134344.db3": {
+  "label": "na",
+  "labeled_at": "2026-10-14T12:09:48",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_134344.db3",
+   "name": "final_approach_and_pick_20251030_134344.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761857026001579384,
+   "duration_s": 4.148003114,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw",
+    "/camera/mast_camera/color/image_raw"
+   ]
+  }
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_134420.db3": {
+  "label": "na",
+  "labeled_at": "2026-10-14T12:10:01",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_134420.db3",
+   "name": "final_approach_and_pick_20251030_134420.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761857061296052673,
+   "duration_s": 6.188003212,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw",
+    "/camera/mast_camera/color/image_raw"
+   ]
+  }
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_134512.db3": {
+  "label": "pick",
+  "labeled_at": "2026-10-14T12:10:35",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_134512.db3",
+   "name": "final_approach_and_pick_20251030_134512.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761857113430093854,
+   "duration_s": 10.820767439,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw",
+    "/camera/mast_camera/color/image_raw"
+   ]
+  },
+  "time_ns": 1761857123275093854,
+  "time_s": 9.845
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_134617.db3": {
+  "label": "pick",
+  "labeled_at": "2026-10-14T12:11:00",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_134617.db3",
+   "name": "final_approach_and_pick_20251030_134617.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761857178417615512,
+   "duration_s": 10.800940984,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw"
+   ]
+  },
+  "time_ns": 1761857187398276957,
+  "time_s": 8.980661445
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_134732.db3": {
+  "label": "na",
+  "labeled_at": "2026-10-14T12:11:04",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_134732.db3",
+   "name": "final_approach_and_pick_20251030_134732.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761857253471428291,
+   "duration_s": 3.895436127,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw",
+    "/camera/mast_camera/color/image_raw"
+   ]
+  }
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_135117.db3": {
+  "label": "pick",
+  "labeled_at": "2026-10-14T12:11:23",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_135117.db3",
+   "name": "final_approach_and_pick_20251030_135117.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761857478493265840,
+   "duration_s": 7.370752913,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw",
+    "/camera/mast_camera/color/image_raw"
+   ]
+  },
+  "time_ns": 1761857483979265840,
+  "time_s": 5.486
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_135237.db3": {
+  "label": "na",
+  "labeled_at": "2026-10-14T12:11:27",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_135237.db3",
+   "name": "final_approach_and_pick_20251030_135237.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761857561212923567,
+   "duration_s": 3.441249908,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw"
+   ]
+  }
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_135343.db3": {
+  "label": "pick",
+  "labeled_at": "2026-10-14T12:11:57",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_135343.db3",
+   "name": "final_approach_and_pick_20251030_135343.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761857624418286059,
+   "duration_s": 7.206865107,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw",
+    "/camera/mast_camera/color/image_raw"
+   ]
+  },
+  "time_ns": 1761857629374684509,
+  "time_s": 4.95639845
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_135620.db3": {
+  "label": "pick",
+  "labeled_at": "2026-10-14T12:12:32",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_135620.db3",
+   "name": "final_approach_and_pick_20251030_135620.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761857781379755618,
+   "duration_s": 13.730059924,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw",
+    "/camera/mast_camera/color/image_raw"
+   ]
+  },
+  "time_ns": 1761857793175755618,
+  "time_s": 11.796
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_135801.db3": {
+  "label": "pick",
+  "labeled_at": "2026-10-14T12:12:48",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_135801.db3",
+   "name": "final_approach_and_pick_20251030_135801.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761857881691941936,
+   "duration_s": 6.615826909,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw",
+    "/camera/mast_camera/color/image_raw"
+   ]
+  },
+  "time_ns": 1761857886196255000,
+  "time_s": 4.504313064
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_135903.db3": {
+  "label": "na",
+  "labeled_at": "2026-10-14T12:12:55",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_135903.db3",
+   "name": "final_approach_and_pick_20251030_135903.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761857944795180480,
+   "duration_s": 4.124296485,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw",
+    "/camera/mast_camera/color/image_raw"
+   ]
+  }
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_135929.db3": {
+  "label": "na",
+  "labeled_at": "2026-10-14T12:13:11",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_135929.db3",
+   "name": "final_approach_and_pick_20251030_135929.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761857969702868316,
+   "duration_s": 7.894613533,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw",
+    "/camera/mast_camera/color/image_raw"
+   ]
+  }
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_140049.db3": {
+  "label": "pick",
+  "labeled_at": "2026-10-14T12:13:29",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_140049.db3",
+   "name": "final_approach_and_pick_20251030_140049.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761858049725039862,
+   "duration_s": 6.424568045,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw",
+    "/camera/mast_camera/color/image_raw"
+   ]
+  },
+  "time_ns": 1761858053908178357,
+  "time_s": 4.183138495
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_140142.db3": {
+  "label": "na",
+  "labeled_at": "2026-10-14T12:13:35",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_140142.db3",
+   "name": "final_approach_and_pick_20251030_140142.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761858103307319554,
+   "duration_s": 3.590892934,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw",
+    "/camera/mast_camera/color/image_raw"
+   ]
+  }
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_140219.db3": {
+  "label": "pick",
+  "labeled_at": "2026-10-14T12:14:09",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_140219.db3",
+   "name": "final_approach_and_pick_20251030_140219.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761858140088280935,
+   "duration_s": 9.785485474,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw",
+    "/camera/mast_camera/color/image_raw"
+   ]
+  },
+  "time_ns": 1761858148288724405,
+  "time_s": 8.20044347
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_140350.db3": {
+  "label": "pick",
+  "labeled_at": "2026-10-14T12:14:35",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_140350.db3",
+   "name": "final_approach_and_pick_20251030_140350.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761858230737789623,
+   "duration_s": 10.463262694,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw",
+    "/camera/mast_camera/color/image_raw"
+   ]
+  },
+  "time_ns": 1761858239899789623,
+  "time_s": 9.162
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_140546.db3": {
+  "label": "pick",
+  "labeled_at": "2026-10-14T12:14:55",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_140546.db3",
+   "name": "final_approach_and_pick_20251030_140546.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761858347513007709,
+   "duration_s": 9.693978637,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw",
+    "/camera/mast_camera/color/image_raw"
+   ]
+  },
+  "time_ns": 1761858356545973898,
+  "time_s": 9.032966189
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_140742.db3": {
+  "label": "pick",
+  "labeled_at": "2026-10-14T12:15:10",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_140742.db3",
+   "name": "final_approach_and_pick_20251030_140742.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761858462989138946,
+   "duration_s": 9.104376169,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw",
+    "/camera/mast_camera/color/image_raw"
+   ]
+  },
+  "time_ns": 1761858470457138946,
+  "time_s": 7.468
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_140840.db3": {
+  "label": "na",
+  "labeled_at": "2026-10-14T12:15:16",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_140840.db3",
+   "name": "final_approach_and_pick_20251030_140840.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761858521192236084,
+   "duration_s": 5.233953798,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw",
+    "/camera/mast_camera/color/image_raw"
+   ]
+  }
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_140900.db3": {
+  "label": "pick",
+  "labeled_at": "2026-10-14T12:15:50",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_140900.db3",
+   "name": "final_approach_and_pick_20251030_140900.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761858541168106119,
+   "duration_s": 12.993926942,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw",
+    "/camera/mast_camera/color/image_raw"
+   ]
+  },
+  "time_ns": 1761858552730112877,
+  "time_s": 11.562006758
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_141126.db3": {
+  "label": "na",
+  "labeled_at": "2026-10-14T12:15:55",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_141126.db3",
+   "name": "final_approach_and_pick_20251030_141126.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761858686570783782,
+   "duration_s": 5.129016231,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw",
+    "/camera/mast_camera/color/image_raw"
+   ]
+  }
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_141145.db3": {
+  "label": "na",
+  "labeled_at": "2026-10-14T12:16:43",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_141145.db3",
+   "name": "final_approach_and_pick_20251030_141145.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761858706775974400,
+   "duration_s": 19.027177222,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw",
+    "/camera/mast_camera/color/image_raw"
+   ]
+  }
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_141314.db3": {
+  "label": "na",
+  "labeled_at": "2026-10-14T12:16:56",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_141314.db3",
+   "name": "final_approach_and_pick_20251030_141314.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761858796016097803,
+   "duration_s": 8.912230767,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw",
+    "/camera/mast_camera/color/image_raw"
+   ]
+  }
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_141624.db3": {
+  "label": "na",
+  "labeled_at": "2026-10-14T12:17:34",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_141624.db3",
+   "name": "final_approach_and_pick_20251030_141624.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761858985494153032,
+   "duration_s": 12.945543058,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw",
+    "/camera/mast_camera/color/image_raw"
+   ]
+  }
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_141747.db3": {
+  "label": "na",
+  "labeled_at": "2026-10-14T12:17:52",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_141747.db3",
+   "name": "final_approach_and_pick_20251030_141747.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761859068007889939,
+   "duration_s": 8.735701935,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw",
+    "/camera/mast_camera/color/image_raw"
+   ]
+  }
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_141836.db3": {
+  "label": "pick",
+  "labeled_at": "2026-10-14T12:18:22",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_141836.db3",
+   "name": "final_approach_and_pick_20251030_141836.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761859117378982157,
+   "duration_s": 8.630769438,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw",
+    "/camera/mast_camera/color/image_raw"
+   ]
+  },
+  "time_ns": 1761859123858239832,
+  "time_s": 6.479257675
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_142033.db3": {
+  "label": "na",
+  "labeled_at": "2026-10-14T12:19:01",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_142033.db3",
+   "name": "final_approach_and_pick_20251030_142033.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761859235434050687,
+   "duration_s": 18.180232119,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw",
+    "/camera/mast_camera/color/image_raw"
+   ]
+  }
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_142132.db3": {
+  "label": "na",
+  "labeled_at": "2026-10-14T12:19:13",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_142132.db3",
+   "name": "final_approach_and_pick_20251030_142132.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761859292579616891,
+   "duration_s": 7.398892316,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw",
+    "/camera/mast_camera/color/image_raw"
+   ]
+  }
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_142154.db3": {
+  "label": "pick",
+  "labeled_at": "2026-10-14T12:19:41",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_142154.db3",
+   "name": "final_approach_and_pick_20251030_142154.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761859315511350087,
+   "duration_s": 7.077331448,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw",
+    "/camera/mast_camera/color/image_raw"
+   ]
+  },
+  "time_ns": 1761859320512350087,
+  "time_s": 5.001
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_142303.db3": {
+  "label": "pick",
+  "labeled_at": "2026-10-14T12:20:12",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_142303.db3",
+   "name": "final_approach_and_pick_20251030_142303.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761859384928844304,
+   "duration_s": 8.95817786,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw",
+    "/camera/mast_camera/color/image_raw"
+   ]
+  },
+  "time_ns": 1761859391773138713,
+  "time_s": 6.844294409
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_142419.db3": {
+  "label": "pick",
+  "labeled_at": "2026-10-14T12:20:40",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_142419.db3",
+   "name": "final_approach_and_pick_20251030_142419.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761859460529810083,
+   "duration_s": 7.108978726,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw",
+    "/camera/mast_camera/color/image_raw"
+   ]
+  },
+  "time_ns": 1761859465348073019,
+  "time_s": 4.818262936
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_142823.db3": {
+  "label": "na",
+  "labeled_at": "2026-10-14T12:20:46",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_142823.db3",
+   "name": "final_approach_and_pick_20251030_142823.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761859703714756319,
+   "duration_s": 3.866290102,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw",
+    "/camera/mast_camera/color/image_raw"
+   ]
+  }
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_142918.db3": {
+  "label": "pick",
+  "labeled_at": "2026-10-14T12:21:42",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_142918.db3",
+   "name": "final_approach_and_pick_20251030_142918.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761859759147220788,
+   "duration_s": 12.742177162,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw",
+    "/camera/mast_camera/color/image_raw"
+   ]
+  },
+  "time_ns": 1761859770859118274,
+  "time_s": 11.711897486
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_143031.db3": {
+  "label": "pick",
+  "labeled_at": "2026-10-14T12:22:09",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_143031.db3",
+   "name": "final_approach_and_pick_20251030_143031.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761859832045511863,
+   "duration_s": 13.481495382,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw",
+    "/camera/mast_camera/color/image_raw"
+   ]
+  },
+  "time_ns": 1761859843964348379,
+  "time_s": 11.918836516
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_143206.db3": {
+  "label": "na",
+  "labeled_at": "2026-10-14T12:23:39",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_143206.db3",
+   "name": "final_approach_and_pick_20251030_143206.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761859927239176781,
+   "duration_s": 44.94755076,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw",
+    "/camera/mast_camera/color/image_raw"
+   ]
+  }
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_143337.db3": {
+  "label": "na",
+  "labeled_at": "2026-10-14T12:23:49",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_143337.db3",
+   "name": "final_approach_and_pick_20251030_143337.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761860017857568638,
+   "duration_s": 9.691263883,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw",
+    "/camera/mast_camera/color/image_raw"
+   ]
+  }
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_143417.db3": {
+  "label": "na",
+  "labeled_at": "2026-10-14T12:24:02",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_143417.db3",
+   "name": "final_approach_and_pick_20251030_143417.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761860058543205045,
+   "duration_s": 7.056873516,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw",
+    "/camera/mast_camera/color/image_raw"
+   ]
+  }
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_143452.db3": {
+  "label": "pick",
+  "labeled_at": "2026-10-14T12:24:43",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_143452.db3",
+   "name": "final_approach_and_pick_20251030_143452.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761860093530297395,
+   "duration_s": 9.119884024,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw",
+    "/camera/mast_camera/color/image_raw"
+   ]
+  },
+  "time_ns": 1761860101038297395,
+  "time_s": 7.508
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_143657.db3": {
+  "label": "pick",
+  "labeled_at": "2026-10-14T12:24:58",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_143657.db3",
+   "name": "final_approach_and_pick_20251030_143657.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761860218256692837,
+   "duration_s": 8.008919122,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw",
+    "/camera/mast_camera/color/image_raw"
+   ]
+  },
+  "time_ns": 1761860224066434620,
+  "time_s": 5.809741783
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_143809.db3": {
+  "label": "na",
+  "labeled_at": "2026-10-14T12:25:07",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_143809.db3",
+   "name": "final_approach_and_pick_20251030_143809.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761860289547676464,
+   "duration_s": 5.525653477,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw",
+    "/camera/mast_camera/color/image_raw"
+   ]
+  }
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_143827.db3": {
+  "label": "pick",
+  "labeled_at": "2026-10-14T12:25:21",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_143827.db3",
+   "name": "final_approach_and_pick_20251030_143827.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761860308768590660,
+   "duration_s": 4.730841726,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw",
+    "/camera/mast_camera/color/image_raw"
+   ]
+  },
+  "time_ns": 1761860311131902036,
+  "time_s": 2.363311376
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_143914.db3": {
+  "label": "na",
+  "labeled_at": "2026-10-14T12:25:50",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_143914.db3",
+   "name": "final_approach_and_pick_20251030_143914.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761860355728242287,
+   "duration_s": 12.656867545,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw",
+    "/camera/mast_camera/color/image_raw"
+   ]
+  }
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_144050.db3": {
+  "label": "na",
+  "labeled_at": "2026-10-14T12:25:57",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_144050.db3",
+   "name": "final_approach_and_pick_20251030_144050.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761860451379637967,
+   "duration_s": 5.289881676,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw",
+    "/camera/mast_camera/color/image_raw"
+   ]
+  }
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_144112.db3": {
+  "label": "na",
+  "labeled_at": "2026-10-14T12:26:36",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_144112.db3",
+   "name": "final_approach_and_pick_20251030_144112.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761860473114845293,
+   "duration_s": 12.162116222,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw",
+    "/camera/mast_camera/color/image_raw"
+   ]
+  }
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_144230.db3": {
+  "label": "pick",
+  "labeled_at": "2026-10-14T12:27:09",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_144230.db3",
+   "name": "final_approach_and_pick_20251030_144230.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761860550639266511,
+   "duration_s": 11.882497066,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw",
+    "/camera/mast_camera/color/image_raw"
+   ]
+  },
+  "time_ns": 1761860560449261634,
+  "time_s": 9.809995123
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_144338.db3": {
+  "label": "na",
+  "labeled_at": "2026-10-14T12:27:19",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_144338.db3",
+   "name": "final_approach_and_pick_20251030_144338.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761860619830579458,
+   "duration_s": 8.491034751,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw",
+    "/camera/mast_camera/color/image_raw"
+   ]
+  }
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_144444.db3": {
+  "label": "pick",
+  "labeled_at": "2026-10-14T12:28:17",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_144444.db3",
+   "name": "final_approach_and_pick_20251030_144444.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761860685335367078,
+   "duration_s": 10.53196634,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw",
+    "/camera/mast_camera/color/image_raw"
+   ]
+  },
+  "time_ns": 1761860694014762454,
+  "time_s": 8.679395376
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_144548.db3": {
+  "label": "pick",
+  "labeled_at": "2026-10-14T12:28:54",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_144548.db3",
+   "name": "final_approach_and_pick_20251030_144548.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761860748813358765,
+   "duration_s": 10.739957782,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw",
+    "/camera/mast_camera/color/image_raw"
+   ]
+  },
+  "time_ns": 1761860757703563893,
+  "time_s": 8.890205128
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_144712.db3": {
+  "label": "na",
+  "labeled_at": "2026-10-14T12:29:07",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_144712.db3",
+   "name": "final_approach_and_pick_20251030_144712.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761860833537433902,
+   "duration_s": 10.766739885,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw",
+    "/camera/mast_camera/color/image_raw"
+   ]
+  }
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_144845.db3": {
+  "label": "pick",
+  "labeled_at": "2026-10-14T12:29:46",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_144845.db3",
+   "name": "final_approach_and_pick_20251030_144845.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761860926076347864,
+   "duration_s": 8.074737103,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw",
+    "/camera/mast_camera/color/image_raw"
+   ]
+  },
+  "time_ns": 1761860932687931061,
+  "time_s": 6.611583197
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_145001.db3": {
+  "label": "pick",
+  "labeled_at": "2026-10-14T12:30:03",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_145001.db3",
+   "name": "final_approach_and_pick_20251030_145001.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761861001933788557,
+   "duration_s": 8.554584808,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw",
+    "/camera/mast_camera/color/image_raw"
+   ]
+  },
+  "time_ns": 1761861008669520714,
+  "time_s": 6.735732157
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_145226.db3": {
+  "label": "pick",
+  "labeled_at": "2026-10-14T12:30:37",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_145226.db3",
+   "name": "final_approach_and_pick_20251030_145226.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761861146723246741,
+   "duration_s": 7.916578287,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw",
+    "/camera/mast_camera/color/image_raw"
+   ]
+  },
+  "time_ns": 1761861154611246741,
+  "time_s": 7.888
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_145507.db3": {
+  "label": "pick",
+  "labeled_at": "2026-10-14T12:31:38",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_145507.db3",
+   "name": "final_approach_and_pick_20251030_145507.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761861307859056999,
+   "duration_s": 13.751699748,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw",
+    "/camera/mast_camera/color/image_raw"
+   ]
+  },
+  "time_ns": 1761861319898666837,
+  "time_s": 12.039609838
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_145627.db3": {
+  "label": "na",
+  "labeled_at": "2026-10-14T12:31:47",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_145627.db3",
+   "name": "final_approach_and_pick_20251030_145627.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761861388355965382,
+   "duration_s": 6.982893139,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw",
+    "/camera/mast_camera/color/image_raw"
+   ]
+  }
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_145700.db3": {
+  "label": "pick",
+  "labeled_at": "2026-10-14T12:32:30",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_145700.db3",
+   "name": "final_approach_and_pick_20251030_145700.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761861421154359254,
+   "duration_s": 11.724647752,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw",
+    "/camera/mast_camera/color/image_raw"
+   ]
+  },
+  "time_ns": 1761861431928746886,
+  "time_s": 10.774387632
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_145856.db3": {
+  "label": "pick",
+  "labeled_at": "2026-10-14T12:32:50",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_145856.db3",
+   "name": "final_approach_and_pick_20251030_145856.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761861537264278951,
+   "duration_s": 7.604117688,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw",
+    "/camera/mast_camera/color/image_raw"
+   ]
+  },
+  "time_ns": 1761861543168278951,
+  "time_s": 5.904
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_150019.db3": {
+  "label": "pick",
+  "labeled_at": "2026-10-14T12:33:08",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_150019.db3",
+   "name": "final_approach_and_pick_20251030_150019.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761861620674583483,
+   "duration_s": 6.815063202,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw",
+    "/camera/mast_camera/color/image_raw"
+   ]
+  },
+  "time_ns": 1761861625853232293,
+  "time_s": 5.17864881
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_150326.db3": {
+  "label": "na",
+  "labeled_at": "2026-10-14T12:33:46",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_150326.db3",
+   "name": "final_approach_and_pick_20251030_150326.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761861807087674618,
+   "duration_s": 16.272573388,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw",
+    "/camera/mast_camera/color/image_raw"
+   ]
+  }
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_150419.db3": {
+  "label": "na",
+  "labeled_at": "2026-10-14T12:33:59",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_150419.db3",
+   "name": "final_approach_and_pick_20251030_150419.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761861859866789195,
+   "duration_s": 7.251282994,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw",
+    "/camera/mast_camera/color/image_raw"
+   ]
+  }
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_150803.db3": {
+  "label": "pick",
+  "labeled_at": "2026-10-14T12:34:42",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_150803.db3",
+   "name": "final_approach_and_pick_20251030_150803.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761862084552756545,
+   "duration_s": 12.024549731,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw",
+    "/camera/mast_camera/color/image_raw"
+   ]
+  },
+  "time_ns": 1761862094379756545,
+  "time_s": 9.827
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_151610.db3": {
+  "label": "na",
+  "labeled_at": "2026-10-14T12:34:47",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_151610.db3",
+   "name": "final_approach_and_pick_20251030_151610.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761862571212100518,
+   "duration_s": 5.190594912,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw",
+    "/camera/mast_camera/color/image_raw"
+   ]
+  }
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_151837.db3": {
+  "label": "na",
+  "labeled_at": "2026-10-14T12:35:17",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_151837.db3",
+   "name": "final_approach_and_pick_20251030_151837.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761862719111206803,
+   "duration_s": 8.637148992,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw",
+    "/camera/mast_camera/color/image_raw"
+   ]
+  }
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_152117.db3": {
+  "label": "na",
+  "labeled_at": "2026-10-14T12:35:58",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_152117.db3",
+   "name": "final_approach_and_pick_20251030_152117.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761862877611437800,
+   "duration_s": 13.691405632,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw",
+    "/camera/mast_camera/color/image_raw"
+   ]
+  }
+ },
+ "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_153137.db3": {
+  "label": "na",
+  "labeled_at": "2026-10-14T12:36:41",
+  "bag": {
+   "path": "/mnt/data/eva_rosbags/prosser_2025/eva_day3/final_approach_and_pick_20251030_153137.db3",
+   "name": "final_approach_and_pick_20251030_153137.db3",
+   "storage_id": "sqlite3",
+   "start_ns": 1761863498099177447,
+   "duration_s": 17.282719076,
+   "batch": null,
+   "apple": null,
+   "pull_type": "",
+   "pick_result": "",
+   "image_topics": [
+    "/image_raw",
+    "/camera/mast_camera/color/image_raw"
+   ]
+  }
+ }
+}
